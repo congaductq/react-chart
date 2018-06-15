@@ -12,7 +12,7 @@ import {
 	strokeDashTypes,
 } from "../../utils";
 
-class StraightLine extends Component {
+class Line extends Component {
 	constructor(props) {
 		super(props);
 
@@ -47,11 +47,9 @@ class StraightLine extends Component {
 	drawOnCanvas(ctx, moreProps) {
 		const { stroke, strokeWidth, strokeOpacity, strokeDasharray } = this.props;
 		const { x1, y1, x2, y2 } = helper(this.props, moreProps);
-
 		ctx.lineWidth = strokeWidth;
 		ctx.strokeStyle = hexToRGBA(stroke, strokeOpacity);
 		ctx.setLineDash(getStrokeDasharray(strokeDasharray).split(","));
-
 		ctx.beginPath();
 		ctx.moveTo(x1, y1);
 		ctx.lineTo(x2, y2);
@@ -156,7 +154,6 @@ export function isHovering({
 
 function helper(props, moreProps) {
 	const { x1Value, x2Value, y1Value, y2Value, type } = props;
-
 	const { xScale, chartConfig: { yScale } } = moreProps;
 
 	const modLine = generateLine({
@@ -211,7 +208,7 @@ export function generateLine({
 	}
 }
 
-export function getXLineCoordinates({
+function getXLineCoordinates({
 	start, end, xScale, yScale, m, b
 }) {
 	const [xBegin, xFinish] = xScale.domain();
@@ -233,25 +230,22 @@ export function getXLineCoordinates({
 	};
 }
 
-export function getRayCoordinates({
-	start, end, xScale, yScale, m, b
+function getRayCoordinates({
+	start, end, m, b
 }) {
-	const [xBegin, xFinish] = xScale.domain();
-	const [yBegin, yFinish] = yScale.domain();
 
 	const x1 = start[0];
+	const x2 = end[0];
+
 	if (end[0] === start[0]) {
 		return {
 			x1,
 			y1: start[1],
 			x2: x1,
-			y2: end[1] > start[1] ? yFinish : yBegin,
+			y2: end[1],
 		};
 	}
 
-	const x2 = end[0] > start[0]
-		? xFinish
-		: xBegin;
 
 	return {
 		x1, y1: m * x1 + b,
@@ -280,7 +274,7 @@ function getLineCoordinates({
 	};
 }
 
-StraightLine.propTypes = {
+Line.propTypes = {
 	x1Value: PropTypes.any.isRequired,
 	x2Value: PropTypes.any.isRequired,
 	y1Value: PropTypes.any.isRequired,
@@ -318,7 +312,7 @@ StraightLine.propTypes = {
 	selected: PropTypes.bool.isRequired,
 };
 
-StraightLine.defaultProps = {
+Line.defaultProps = {
 	onEdge1Drag: noop,
 	onEdge2Drag: noop,
 	onDragStart: noop,
@@ -337,4 +331,4 @@ StraightLine.defaultProps = {
 	selected: false,
 };
 
-export default StraightLine;
+export default Line;

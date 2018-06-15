@@ -9,19 +9,18 @@ import {
 	saveNodeType,
 	isHoverForInteractiveType,
 } from "./utils";
-import EachEquidistantChannel from "./wrapper/EachEquidistantChannel";
-import { getSlope, getYIntercept } from "./components/StraightLine";
+import EachPitchFork from "./wrapper/EachPitchFork";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
 
-class EquidistantChannel extends Component {
+class PitchFork extends Component {
 	constructor(props) {
 		super(props);
 
 		this.handleStart = this.handleStart.bind(this);
 		this.handleEnd = this.handleEnd.bind(this);
-		this.handleDrawChannel = this.handleDrawChannel.bind(this);
 		this.handleDragChannel = this.handleDragChannel.bind(this);
+		this.handleDrawChannel = this.handleDrawChannel.bind(this);
 		this.handleDragChannelComplete = this.handleDragChannelComplete.bind(this);
 
 		this.terminate = terminate.bind(this);
@@ -61,11 +60,10 @@ class EquidistantChannel extends Component {
 	}
 	handleDrawChannel(xyValue) {
 		const { current } = this.state;
-
 		if (isDefined(current)
 				&& isDefined(current.startXY)) {
 			this.mouseMoved = true;
-			if (isNotDefined(current.dy)) {
+			if (isNotDefined(current.finishXY)) {
 				this.setState({
 					current: {
 						startXY: current.startXY,
@@ -73,15 +71,10 @@ class EquidistantChannel extends Component {
 					}
 				});
 			} else {
-				const m = getSlope(current.startXY, current.endXY);
-				const b = getYIntercept(m, current.endXY);
-				const y = m * xyValue[0] + b;
-				const dy = xyValue[1] - y;
-
 				this.setState({
 					current: {
 						...current,
-						dy,
+						finishXY: xyValue,
 					}
 				});
 			}
@@ -104,16 +97,15 @@ class EquidistantChannel extends Component {
 	handleEnd(xyValue, moreProps, e) {
 		const { current } = this.state;
 		const { channels, appearance } = this.props;
-
 		if (this.mouseMoved
 			&& isDefined(current)
 			&& isDefined(current.startXY)
 		) {
-			if (isNotDefined(current.dy)) {
+			if (isNotDefined(current.finishXY)) {
 				this.setState({
 					current: {
 						...current,
-						dy: 0
+						finishXY: [current.endXY[0], current.endXY[1]],
 					}
 				});
 			} else {
@@ -142,9 +134,8 @@ class EquidistantChannel extends Component {
 		const { channels, hoverText } = this.props;
 		const { current, override } = this.state;
 		const overrideIndex = isDefined(override) ? override.index : null;
-
 		const tempChannel = isDefined(current) && isDefined(current.endXY)
-			? <EachEquidistantChannel
+			? <EachPitchFork
 				interactive={false}
 				{...current}
 				appearance={appearance}
@@ -157,7 +148,7 @@ class EquidistantChannel extends Component {
 					? { ...appearance, ...each.appearance }
 					: appearance;
 
-				return <EachEquidistantChannel key={idx}
+				return <EachPitchFork key={idx}
 					ref={this.saveNodeType(idx)}
 					index={idx}
 					selected={each.selected}
@@ -184,7 +175,7 @@ class EquidistantChannel extends Component {
 }
 
 
-EquidistantChannel.propTypes = {
+PitchFork.propTypes = {
 	enabled: PropTypes.bool.isRequired,
 
 	onStart: PropTypes.func.isRequired,
@@ -213,7 +204,7 @@ EquidistantChannel.propTypes = {
 	}).isRequired
 };
 
-EquidistantChannel.defaultProps = {
+PitchFork.defaultProps = {
 	onStart: noop,
 	onComplete: noop,
 	onSelect: noop,
@@ -245,4 +236,4 @@ EquidistantChannel.defaultProps = {
 	}
 };
 
-export default EquidistantChannel;
+export default PitchFork;
