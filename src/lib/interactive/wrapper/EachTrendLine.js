@@ -152,7 +152,6 @@ class EachTrendLine extends Component {
 			onDragComplete,
 		} = this.props;
 		const { hover, anchor } = this.state;
-
 		// console.log("SELECTED ->", selected);
 		const { enable: hoverTextEnabled, ...restHoverTextProps } = hoverText;
 
@@ -219,7 +218,6 @@ export function getNewXY(moreProps) {
 	const [small, big] = yScale.domain().slice().sort(d3Ascending);
 	const y = yScale.invert(mouseY);
 	const newY = Math.min(Math.max(y, small), big);
-
 	return [x, newY];
 }
 
@@ -235,6 +233,7 @@ EachTrendLine.propTypes = {
 		"XLINE", // extends from -Infinity to +Infinity
 		"RAY", // extends to +/-Infinity in one direction
 		"LINE", // extends between the set bounds
+		"ARROW", // arrow
 	]).isRequired,
 
 	onDrag: PropTypes.func.isRequired,

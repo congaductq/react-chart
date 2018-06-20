@@ -12,12 +12,12 @@ import {
 	isHoverForInteractiveType,
 } from "./utils";
 
-import EachLine from "./wrapper/EachLine";
-import LineComponent from "./components/Line";
+import EachAngle from "./wrapper/EachAngle";
+import AngleComponent from "./components/Angle";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
 
-class Line extends Component {
+class Angle extends Component {
 	constructor(props) {
 		super(props);
 
@@ -132,7 +132,7 @@ class Line extends Component {
     const { current, override } = this.state;
 
 		const tempLine = isDefined(current) && isDefined(current.end)
-			? <LineComponent type={type}
+			? <AngleComponent type={type}
 				noHover
 				x1Value={current.start[0]}
 				y1Value={current.start[1]}
@@ -148,7 +148,7 @@ class Line extends Component {
 				const eachAppearance = isDefined(each.appearance)
 					? { ...appearance, ...each.appearance } : appearance;
 
-				return <EachLine key={idx}
+				return <EachAngle key={idx}
 					ref={this.saveNodeType(idx)}
 					index={idx}
 					type={each.type}
@@ -191,7 +191,7 @@ class Line extends Component {
 }
 
 
-Line.propTypes = {
+Angle.propTypes = {
 	snap: PropTypes.bool.isRequired,
 	enabled: PropTypes.bool.isRequired,
 	snapTo: PropTypes.func,
@@ -225,7 +225,7 @@ Line.propTypes = {
 	}).isRequired
 };
 
-Line.defaultProps = {
+Angle.defaultProps = {
 	type: "XLINE",
 
 	onStart: noop,
@@ -259,4 +259,4 @@ Line.defaultProps = {
 	}
 };
 
-export default Line;
+export default Angle;

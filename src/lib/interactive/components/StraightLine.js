@@ -45,7 +45,7 @@ class StraightLine extends Component {
 		return false;
 	}
 	drawOnCanvas(ctx, moreProps) {
-		const { stroke, strokeWidth, strokeOpacity, strokeDasharray } = this.props;
+		const { stroke, strokeWidth, strokeOpacity, strokeDasharray, type } = this.props;
 		const { x1, y1, x2, y2 } = helper(this.props, moreProps);
 
 		ctx.lineWidth = strokeWidth;
@@ -55,6 +55,13 @@ class StraightLine extends Component {
 		ctx.beginPath();
 		ctx.moveTo(x1, y1);
 		ctx.lineTo(x2, y2);
+		if (type === "ARROW") {
+			const headlen = 20;
+			const angle = Math.atan2(y2 - y1, x2 - x1);
+			ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+			ctx.moveTo(x2, y2);
+			ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+		}
 		ctx.stroke();
 	}
 	renderSVG(moreProps) {
@@ -194,7 +201,7 @@ export function generateLine({
 	const m /* slope */ = getSlope(start, end);
 	// console.log(end[0] - start[0], m)
 	const b /* y intercept */ = getYIntercept(m, start);
-
+	console.log(type)
 	switch (type) {
 		case "XLINE":
 			return getXLineCoordinates({
@@ -205,6 +212,10 @@ export function generateLine({
 				type, start, end, xScale, yScale, m, b
 			});
 		case "LINE":
+			return getLineCoordinates({
+				type, start, end, xScale, yScale, m, b
+			});
+		case "ARROW":
 			return getLineCoordinates({
 				type, start, end, xScale, yScale, m, b
 			});
@@ -296,6 +307,7 @@ StraightLine.propTypes = {
 		"XLINE", // extends from -Infinity to +Infinity
 		"RAY", // extends to +/-Infinity in one direction
 		"LINE", // extends between the set bounds
+		"ARROW", // arrow
 	]).isRequired,
 
 	onEdge1Drag: PropTypes.func.isRequired,

@@ -101,15 +101,17 @@ class InteractiveText extends Component {
 		} */
 	}
 	render() {
-		const { textList, defaultText } = this.props;
+		const { textList, defaultText, type } = this.props;
 		const { override } = this.state;
 		return <g>
 			{textList.map((each, idx) => {
 				const props = {
 					...defaultText,
 					...each,
+					type,
 				};
-				return <EachText key={idx}
+				return <EachText
+					key={idx}
 					ref={this.saveNodeType(idx)}
 					index={idx}
 					{...props}
@@ -136,6 +138,10 @@ class InteractiveText extends Component {
 }
 
 InteractiveText.propTypes = {
+	type: PropTypes.oneOf([
+		"TEXT", // extends from -Infinity to +Infinity
+		"BUBBLE", // extends to +/-Infinity in one direction
+	]),
 	onChoosePosition: PropTypes.func.isRequired,
 	onDragComplete: PropTypes.func.isRequired,
 	onSelect: PropTypes.func,
@@ -157,6 +163,7 @@ InteractiveText.propTypes = {
 };
 
 InteractiveText.defaultProps = {
+	type: "TEXT",
 	onChoosePosition: noop,
 	onDragComplete: noop,
 	onSelect: noop,
@@ -169,7 +176,7 @@ InteractiveText.defaultProps = {
 		fontSize: 12,
 		fontStyle: "normal",
 		fontWeight: "normal",
-		text: "Lorem ipsum..."
+		text: "Text..."
 	},
 	hoverText: {
 		...HoverTextNearMouse.defaultProps,

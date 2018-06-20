@@ -73,6 +73,7 @@ class EachText extends Component {
 	}
 	render() {
 		const {
+			type,
 			position,
 			bgFill,
 			bgOpacity,
@@ -94,14 +95,12 @@ class EachText extends Component {
 		};
 
 		const { enable: hoverTextEnabled, ...restHoverTextProps } = hoverText;
-
 		return <g>
 			<InteractiveText
 				ref={this.saveNodeType("text")}
 				selected={selected || hover}
 				interactiveCursorClass="react-stockcharts-move-cursor"
 				{...hoverHandler}
-
 				onDragStart={this.handleDragStart}
 				onDrag={this.handleDrag}
 				onDragComplete={onDragComplete}
@@ -115,6 +114,7 @@ class EachText extends Component {
 				fontWeight={fontWeight}
 				fontSize={fontSize}
 				text={text}
+				type={type}
 			/>
 			<HoverTextNearMouse
 				show={hoverTextEnabled && hover && !selected}
@@ -134,6 +134,10 @@ export function getNewXY(moreProps, snapTo) {
 }
  */
 EachText.propTypes = {
+	type: PropTypes.oneOf([
+		"TEXT", // extends from -Infinity to +Infinity
+		"BUBBLE", // extends to +/-Infinity in one direction
+	]),
 	index: PropTypes.number,
 
 	position: PropTypes.array.isRequired,

@@ -6,11 +6,11 @@ import { noop, strokeDashTypes } from "../../utils";
 import { saveNodeType, isHover } from "../utils";
 import { getXValue } from "../../utils/ChartDataUtil";
 
-import Line from "../components/Line";
+import Angle from "../components/Angle";
 import ClickableCircle from "../components/ClickableCircle";
 import HoverTextNearMouse from "../components/HoverTextNearMouse";
 
-class EachLine extends Component {
+class EachAngle extends Component {
 	constructor(props) {
 		super(props);
 
@@ -157,8 +157,8 @@ class EachLine extends Component {
 		const { enable: hoverTextEnabled, ...restHoverTextProps } = hoverText;
 
 		return <g>
-			<Line
-				ref={this.saveNodeType("line")}
+			<Angle
+				ref={this.saveNodeType("angle")}
 				selected={selected || hover}
 				onHover={this.handleHover}
 				onUnHover={this.handleHover}
@@ -223,7 +223,7 @@ export function getNewXY(moreProps) {
 	return [x, newY];
 }
 
-EachLine.propTypes = {
+EachAngle.propTypes = {
 	x1Value: PropTypes.any.isRequired,
 	x2Value: PropTypes.any.isRequired,
 	y1Value: PropTypes.any.isRequired,
@@ -262,7 +262,7 @@ EachLine.propTypes = {
 	hoverText: PropTypes.object.isRequired,
 };
 
-EachLine.defaultProps = {
+EachAngle.defaultProps = {
 	onDrag: noop,
 	onEdge1Drag: noop,
 	onEdge2Drag: noop,
@@ -284,4 +284,4 @@ EachLine.defaultProps = {
 	}
 };
 
-export default EachLine;
+export default EachAngle;

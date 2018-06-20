@@ -17,7 +17,7 @@ class InteractiveText extends Component {
 		this.isHover = this.isHover.bind(this);
 	}
 	isHover(moreProps) {
-		const { onHover } = this.props;
+		const { onHover, type } = this.props;
 
 		if (
 			isDefined(onHover)
@@ -26,19 +26,25 @@ class InteractiveText extends Component {
 		) {
 			const { rect } = helper(this.props, moreProps, this.textWidth);
 			const { mouseXY: [x, y] } = moreProps;
-
-			if (
+			const radius = rect.height / 2;
+			const arrowHeight = 10;
+			if (type === "BUBBLE" &&
+				x >= rect.x - radius
+				&& y >= rect.y - rect.height - arrowHeight
+				&& x <= rect.x + rect.width
+				&& y <= rect.y) {
+				return true;
+			} else if (type === "TEXT" &&
 				x >= rect.x
 				&& y >= rect.y
 				&& x <= rect.x + rect.width
-				&& y <= rect.y + rect.height
-			) {
+				&& y <= rect.y + rect.height) {
 				return true;
 			}
 		}
 		return false;
 	}
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		this.calculateTextWidth = (
 			nextProps.text !== this.props.text
 			|| nextProps.fontStyle !== this.props.fontStyle
@@ -57,6 +63,7 @@ class InteractiveText extends Component {
 			fontStyle,
 			fontWeight,
 			text,
+			type,
 		} = this.props;
 
 		if (this.calculateTextWidth) {
@@ -65,28 +72,43 @@ class InteractiveText extends Component {
 			this.textWidth = width;
 			this.calculateTextWidth = false;
 		}
-
-		const { selected } = this.props;
-
 		const { x, y, rect } = helper(this.props, moreProps, this.textWidth);
-
+		const radius = rect.height / 2;
+		const arrowHeight = 10;
+		const endX = rect.x + rect.width;
+		const endY = rect.y - rect.height - arrowHeight;
 		ctx.fillStyle = hexToRGBA(bgFill, bgOpacity);
-
-		ctx.beginPath();
-		ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-
-		if (selected) {
-			ctx.strokeStyle = textFill;
-			ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+		if (type === "TEXT") {
+			ctx.beginPath();
+			ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+			ctx.fillStyle = textFill;
+			ctx.textBaseline = "middle";
+			ctx.textAlign = "center";
+			ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+			ctx.beginPath();
+			ctx.fillText(text, x, y);
+		} else if (type === "BUBBLE") {
+			ctx.beginPath();
+			ctx.moveTo(rect.x, rect.y - arrowHeight);
+			ctx.lineTo(rect.x, rect.y);
+			ctx.lineTo(rect.x + arrowHeight, rect.y - arrowHeight);
+			ctx.lineTo(endX - radius, rect.y - arrowHeight);
+			ctx.quadraticCurveTo(endX, rect.y - arrowHeight, endX, rect.y - arrowHeight - radius);
+			ctx.lineTo(endX, endY + radius);
+			ctx.quadraticCurveTo(endX, endY, endX - radius, endY);
+			ctx.lineTo(rect.x, endY);
+			ctx.quadraticCurveTo(rect.x - radius, endY, rect.x - radius, endY + radius);
+			ctx.lineTo(rect.x - radius, rect.y - arrowHeight - radius);
+			ctx.quadraticCurveTo(rect.x - radius, rect.y - arrowHeight, rect.x, rect.y - arrowHeight);
+			ctx.fill();
+			ctx.stroke();
+			ctx.fillStyle = textFill;
+			ctx.textBaseline = "middle";
+			ctx.textAlign = "center";
+			ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+			ctx.beginPath();
+			ctx.fillText(text, x + (rect.width - radius) / 2, y - arrowHeight - rect.height / 2);
 		}
-
-		ctx.fillStyle = textFill;
-		ctx.textBaseline = "middle";
-		ctx.textAlign = "center";
-		ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
-
-		ctx.beginPath();
-		ctx.fillText(text, x, y);
 	}
 	renderSVG() {
 		throw new Error("svg not implemented");
@@ -125,13 +147,22 @@ function helper(props, moreProps, textWidth) {
 	const [xValue, yValue] = position;
 	const x = xScale(xValue);
 	const y = yScale(yValue);
-
-	const rect = {
-		x: x - textWidth / 2 - fontSize,
-		y: y - fontSize,
-		width: textWidth + fontSize * 2,
-		height: fontSize * 2,
-	};
+	let rect = {};
+	if (props.type === "BUBBLE") {
+		rect = {
+			x: x,
+			y: y,
+			width: textWidth + fontSize * 2,
+			height: fontSize * 2,
+		};
+	} else if (props.type === "TEXT") {
+		rect = {
+			x: x - textWidth / 2 - fontSize,
+			y: y - fontSize,
+			width: textWidth + fontSize * 2,
+			height: fontSize * 2,
+		};
+	}
 
 	return {
 		x, y, rect
@@ -139,6 +170,10 @@ function helper(props, moreProps, textWidth) {
 }
 
 InteractiveText.propTypes = {
+	type: PropTypes.oneOf([
+		"TEXT", // extends from -Infinity to +Infinity
+		"BUBBLE", // extends to +/-Infinity in one direction
+	]),
 	bgFill: PropTypes.string.isRequired,
 	bgOpacity: PropTypes.number.isRequired,
 
@@ -171,7 +206,6 @@ InteractiveText.defaultProps = {
 	onDrag: noop,
 	onDragComplete: noop,
 
-	type: "SD", // standard dev
 	fontWeight: "normal", // standard dev
 
 	strokeWidth: 1,

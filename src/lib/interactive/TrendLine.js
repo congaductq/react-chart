@@ -210,6 +210,7 @@ TrendLine.propTypes = {
 		"XLINE", // extends from -Infinity to +Infinity
 		"RAY", // extends to +/-Infinity in one direction
 		"LINE", // extends between the set bounds
+		"ARROW", // arrow
 	]),
 	hoverText: PropTypes.object.isRequired,
 

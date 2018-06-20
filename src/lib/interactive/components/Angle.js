@@ -12,7 +12,7 @@ import {
 	strokeDashTypes,
 } from "../../utils";
 
-class Line extends Component {
+class Angle extends Component {
 	constructor(props) {
 		super(props);
 
@@ -45,15 +45,26 @@ class Line extends Component {
 		return false;
 	}
 	drawOnCanvas(ctx, moreProps) {
-		const { stroke, strokeWidth, strokeOpacity, strokeDasharray } = this.props;
-		const { x1, y1, x2, y2 } = helper(this.props, moreProps);
-		ctx.lineWidth = strokeWidth;
-		ctx.strokeStyle = hexToRGBA(stroke, strokeOpacity);
-		ctx.setLineDash(getStrokeDasharray(strokeDasharray).split(","));
-		ctx.beginPath();
-		ctx.moveTo(x1, y1);
-		ctx.lineTo(x2, y2);
-		ctx.stroke();
+    const { stroke, strokeWidth, strokeOpacity } = this.props;
+    const { x1, y1, x2, y2, x3, y3 } = helper(this.props, moreProps);
+    const rad = Math.atan2(y2 - y1, x2 - x1) || 0;
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = hexToRGBA(stroke, strokeOpacity);
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([10, 10]);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x3, y3);
+    ctx.moveTo(x1, y1);
+    ctx.arc(x1, y1, x3 - x1, rad > 0 ? 0 : rad, rad > 0 ? rad : 0);
+    ctx.stroke();
+    if (x3 && y3) {
+      ctx.font = "15px Arial";
+      ctx.fillText(Math.round(- Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180) + "°", x3 + 5, y3 + 10);
+    }
 	}
 	renderSVG(moreProps) {
 		const { stroke, strokeWidth, strokeOpacity, strokeDasharray } = this.props;
@@ -168,9 +179,11 @@ function helper(props, moreProps) {
 	const y1 = yScale(modLine.y1);
 	const x2 = xScale(modLine.x2);
 	const y2 = yScale(modLine.y2);
+	const x3 = xScale(modLine.x1 + 10);
+	const y3 = yScale(modLine.y1);
 
 	return {
-		x1, y1, x2, y2
+		x1, y1, x2, y2, x3, y3
 	};
 }
 
@@ -274,7 +287,7 @@ function getLineCoordinates({
 	};
 }
 
-Line.propTypes = {
+Angle.propTypes = {
 	x1Value: PropTypes.any.isRequired,
 	x2Value: PropTypes.any.isRequired,
 	y1Value: PropTypes.any.isRequired,
@@ -312,7 +325,7 @@ Line.propTypes = {
 	selected: PropTypes.bool.isRequired,
 };
 
-Line.defaultProps = {
+Angle.defaultProps = {
 	onEdge1Drag: noop,
 	onEdge2Drag: noop,
 	onDragStart: noop,
@@ -331,4 +344,4 @@ Line.defaultProps = {
 	selected: false,
 };
 
-export default Line;
+export default Angle;
