@@ -15,7 +15,6 @@ const ALWAYS_TRUE_TYPES = [
 class GenericChartComponent extends GenericComponent {
 	constructor(props, context) {
 		super(props, context);
-
 		this.preCanvasDraw = this.preCanvasDraw.bind(this);
 		this.postCanvasDraw = this.postCanvasDraw.bind(this);
 		this.shouldTypeProceed = this.shouldTypeProceed.bind(this);

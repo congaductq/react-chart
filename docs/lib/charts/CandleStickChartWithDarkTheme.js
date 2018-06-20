@@ -1,91 +1,41 @@
+
 import React from "react";
 import PropTypes from "prop-types";
 
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 
-import {
-	Modal,
-	Button,
-	FormGroup,
-	ControlLabel,
-	FormControl,
-} from "react-bootstrap";
-
 import { ChartCanvas, Chart } from "react-stockcharts";
-import { CandlestickSeries, BarSeries, MACDSeries } from "react-stockcharts/lib/series";
+import {
+	BarSeries,
+	CandlestickSeries,
+	LineSeries,
+	MACDSeries,
+} from "react-stockcharts/lib/series";
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import {
 	CrossHairCursor,
 	EdgeIndicator,
+	CurrentCoordinate,
+	MouseCoordinateX,
 	MouseCoordinateY,
-	MouseCoordinateX
 } from "react-stockcharts/lib/coordinates";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
-import { OHLCTooltip, MACDTooltip } from "react-stockcharts/lib/tooltip";
-import { macd } from "react-stockcharts/lib/indicator";
-
+import {
+	OHLCTooltip,
+	MovingAverageTooltip,
+	MACDTooltip,
+} from "react-stockcharts/lib/tooltip";
+import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { InteractiveText, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
-import { getMorePropsForChart } from "react-stockcharts/lib/interactive/utils";
-import { head, last, toObject } from "react-stockcharts/lib/utils";
+import { PitchFork as EquidistantChannel, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { last, toObject } from "react-stockcharts/lib/utils";
 import {
 	saveInteractiveNodes,
 	getInteractiveNodes,
 } from "./interactiveutils";
 
-class Dialog extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			text: props.text,
-		};
-		this.handleChange = this.handleChange.bind(this);
-		this.handleSave = this.handleSave.bind(this);
-	}
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			text: nextProps.text,
-		});
-	}
-	handleChange(e) {
-		this.setState({
-			text: e.target.value
-		});
-	}
-	handleSave() {
-		this.props.onSave(this.state.text, this.props.chartId);
-	}
-	render() {
-		const {
-			showModal,
-			onClose,
-		} = this.props;
-		const { text } = this.state;
-
-		return (
-			<Modal show={showModal} onHide={onClose} >
-				<Modal.Header closeButton>
-					<Modal.Title>Edit text</Modal.Title>
-				</Modal.Header>
-
-				<Modal.Body>
-					<form>
-						<FormGroup controlId="text">
-							<ControlLabel>Text</ControlLabel>
-							<FormControl type="text" value={text} onChange={this.handleChange} />
-						</FormGroup>
-					</form>
-				</Modal.Body>
-
-				<Modal.Footer>
-					<Button bsStyle="primary" onClick={this.handleSave}>Save</Button>
-				</Modal.Footer>
-			</Modal>
-		);
-	}
-}
 const macdAppearance = {
 	stroke: {
 		macd: "#FF0000",
@@ -96,144 +46,82 @@ const macdAppearance = {
 	},
 };
 
-class CandleStickChartWithText extends React.Component {
+class CandleStickChartWithEquidistantChannel extends React.Component {
 	constructor(props) {
 		super(props);
 		this.onKeyPress = this.onKeyPress.bind(this);
 		this.onDrawComplete = this.onDrawComplete.bind(this);
-		this.handleChoosePosition = this.handleChoosePosition.bind(this);
+		this.saveInteractiveNode = this.saveInteractiveNode.bind(this);
+		this.saveCanvasNode = this.saveCanvasNode.bind(this);
+		this.handleSelection = this.handleSelection.bind(this);
 
 		this.saveInteractiveNodes = saveInteractiveNodes.bind(this);
 		this.getInteractiveNodes = getInteractiveNodes.bind(this);
 
-		this.handleSelection = this.handleSelection.bind(this);
-
-		this.saveCanvasNode = this.saveCanvasNode.bind(this);
-
-		this.handleDialogClose = this.handleDialogClose.bind(this);
-		this.handleTextChange = this.handleTextChange.bind(this);
-
 		this.state = {
 			enableInteractiveObject: true,
-			textList_1: [],
-			textList_3: [],
-			showModal: false,
+			channels_1: [],
+			channels_3: [],
 		};
+	}
+	saveInteractiveNode(node) {
+		this.node = node;
 	}
 	saveCanvasNode(node) {
 		this.canvasNode = node;
 	}
-	handleSelection(interactives, moreProps, e) {
-		if (this.state.enableInteractiveObject) {
-			const independentCharts = moreProps.currentCharts.filter(d => d !== 2)
-			if (independentCharts.length > 0) {
-				const first = head(independentCharts);
-
-				const morePropsForChart = getMorePropsForChart(moreProps, first)
-				const {
-					mouseXY: [, mouseY],
-					chartConfig: { yScale },
-					xAccessor,
-					currentItem,
-				} = morePropsForChart;
-
-				const position = [xAccessor(currentItem), yScale.invert(mouseY)];
-				const newText = {
-					...InteractiveText.defaultProps.defaultText,
-					position,
-				};
-				this.handleChoosePosition(newText, morePropsForChart, e);
-			}
-		} else {
-			const state = toObject(interactives, each => {
-				return [
-					`textList_${each.chartId}`,
-					each.objects,
-				];
-			});
-			this.setState(state);
-		}
-	}
-	handleChoosePosition(text, moreProps) {
-		this.componentWillUnmount();
-		const { id: chartId } = moreProps.chartConfig;
-
-		this.setState({
-			[`textList_${chartId}`]: [
-				...this.state[`textList_${chartId}`],
-				text
-			],
-			showModal: true,
-			text: text.text,
-			chartId
-		});
-	}
-	handleTextChange(text, chartId) {
-		const textList = this.state[`textList_${chartId}`];
-		const allButLast = textList
-			.slice(0, textList.length - 1);
-
-		const lastText = {
-			...last(textList),
-			text,
-		};
-
-		this.setState({
-			[`textList_${chartId}`]: [
-				...allButLast,
-				lastText
-			],
-			showModal: false,
-			enableInteractiveObject: false,
-		});
-		this.componentDidMount();
-	}
-	handleDialogClose() {
-		this.setState({
-			showModal: false,
-		});
-		this.componentDidMount();
-	}
-
 	componentDidMount() {
 		document.addEventListener("keyup", this.onKeyPress);
 	}
 	componentWillUnmount() {
 		document.removeEventListener("keyup", this.onKeyPress);
 	}
-	onDrawComplete(textList, moreProps) {
+	handleSelection(interactives) {
+		const state = toObject(interactives, each => {
+			return [
+				`channels_${each.chartId}`,
+				each.objects,
+			];
+		});
+		this.setState(state);
+	}
+	onDrawComplete(channels_1) {
 		// this gets called on
 		// 1. draw complete of drawing object
 		// 2. drag complete of drawing object
-		const { id: chartId } = moreProps.chartConfig;
-
 		this.setState({
 			enableInteractiveObject: false,
-			[`textList_${chartId}`]: textList,
+			channels_1
 		});
 	}
 	onKeyPress(e) {
 		const keyCode = e.which;
 		console.log(keyCode);
 		switch (keyCode) {
-		case 46: {
-			// DEL
+		case 46: { // DEL
+
+			const channels_1 = this.state.channels_1
+				.filter(each => !each.selected);
+			const channels_3 = this.state.channels_3
+				.filter(each => !each.selected);
+
+			this.canvasNode.cancelDrag();
 			this.setState({
-				textList_1: this.state.textList_1.filter(d => !d.selected),
-				textList_3: this.state.textList_3.filter(d => !d.selected)
+				channels_1,
+				channels_3,
 			});
 			break;
 		}
-		case 27: {
-			// ESC
+		case 27: { // ESC
 			this.node.terminate();
 			this.canvasNode.cancelDrag();
+
 			this.setState({
 				enableInteractiveObject: false
 			});
 			break;
 		}
-		case 68: // D - Draw drawing object
+		case 68:   // D - Draw drawing object
 		case 69: { // E - Enable drawing object
 			this.setState({
 				enableInteractiveObject: true
@@ -243,6 +131,18 @@ class CandleStickChartWithText extends React.Component {
 		}
 	}
 	render() {
+		const ema26 = ema()
+			.id(0)
+			.options({ windowSize: 26 })
+			.merge((d, c) => { d.ema26 = c; })
+			.accessor(d => d.ema26);
+
+		const ema12 = ema()
+			.id(1)
+			.options({ windowSize: 12 })
+			.merge((d, c) => {d.ema12 = c;})
+			.accessor(d => d.ema12);
+
 		const macdCalculator = macd()
 			.options({
 				fast: 12,
@@ -253,12 +153,11 @@ class CandleStickChartWithText extends React.Component {
 			.accessor(d => d.macd);
 
 		const { type, data: initialData, width, ratio } = this.props;
-		const { showModal, text } = this.state;
+		const { channels_1, channels_3 } = this.state;
 
-		const calculatedData = macdCalculator(initialData);
+		const calculatedData = macdCalculator(ema12(ema26(initialData)));
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
-
 		const {
 			data,
 			xScale,
@@ -271,133 +170,145 @@ class CandleStickChartWithText extends React.Component {
 		const xExtents = [start, end];
 
 		return (
-			<div>
-				<ChartCanvas ref={this.saveCanvasNode}
-					height={600}
-					width={width}
-					ratio={ratio}
-					margin={{ left: 70, right: 70, top: 20, bottom: 30 }}
-					type={type}
-					seriesName="MSFT"
-					data={data}
-					xScale={xScale}
-					xAccessor={xAccessor}
-					displayXAccessor={displayXAccessor}
-					xExtents={xExtents}
+			<ChartCanvas ref={this.saveCanvasNode}
+				height={600}
+				width={width}
+				ratio={ratio}
+				margin={{ left: 70, right: 70, top: 20, bottom: 30 }}
+				type={type}
+				seriesName="MSFT"
+				data={data}
+				xScale={xScale}
+				xAccessor={xAccessor}
+				displayXAccessor={displayXAccessor}
+				xExtents={xExtents}
+			>
+				<Chart id={1} height={400}
+					yExtents={[d => [d.high, d.low], ema26.accessor(), ema12.accessor()]}
+					padding={{ top: 10, bottom: 20 }}
 				>
-					<Chart id={1} height={400}
-						yExtents={[d => [d.high, d.low]]}
-						padding={{ top: 10, bottom: 20 }}
-					>
-						<XAxis axisAt="bottom" orient="bottom" showTicks={false} outerTickSize={0} />
-						<YAxis axisAt="right" orient="right" ticks={5} />
-						<MouseCoordinateY
-							at="right"
-							orient="right"
-							displayFormat={format(".2f")} />
+					<XAxis axisAt="bottom" orient="bottom" showTicks={false} outerTickSize={0} />
+					<YAxis axisAt="right" orient="right" ticks={5} />
+					<MouseCoordinateY
+						at="right"
+						orient="right"
+						displayFormat={format(".2f")} />
 
-						<CandlestickSeries />
+					<CandlestickSeries />
+					<LineSeries yAccessor={ema26.accessor()} stroke={ema26.stroke()}/>
+					<LineSeries yAccessor={ema12.accessor()} stroke={ema12.stroke()}/>
 
-						<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-							yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+					<CurrentCoordinate yAccessor={ema26.accessor()} fill={ema26.stroke()} />
+					<CurrentCoordinate yAccessor={ema12.accessor()} fill={ema12.stroke()} />
 
-						<OHLCTooltip origin={[-40, 0]}/>
+					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
+						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
-						<InteractiveText
-							ref={this.saveInteractiveNodes("InteractiveText", 1)}
-							enabled={this.state.enableInteractiveObject}
-							text="Lorem ipsum..."
-							type="BUBBLE"
-							onDragComplete={this.onDrawComplete}
-							textList={this.state.textList_1}
-						/>
+					<OHLCTooltip origin={[-40, 0]}/>
 
-					</Chart>
-					<Chart id={2} height={150}
-						yExtents={[d => d.volume]}
-						origin={(w, h) => [0, h - 300]}
-					>
-						<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
-
-						<MouseCoordinateY
-							at="left"
-							orient="left"
-							displayFormat={format(".4s")} />
-
-						<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
-					</Chart>
-					<Chart id={3} height={150}
-						yExtents={macdCalculator.accessor()}
-						origin={(w, h) => [0, h - 150]}
-						padding={{ top: 10, bottom: 10 }}
-					>
-						<XAxis axisAt="bottom" orient="bottom"/>
-						<YAxis axisAt="right" orient="right" ticks={2} />
-
-						<MouseCoordinateX
-							at="bottom"
-							orient="bottom"
-							displayFormat={timeFormat("%Y-%m-%d")} />
-						<MouseCoordinateY
-							at="right"
-							orient="right"
-							displayFormat={format(".2f")} />
-
-						<MACDSeries yAccessor={d => d.macd}
-							{...macdAppearance} />
-
-						<InteractiveText
-							ref={this.saveInteractiveNodes("InteractiveText", 3)}
-							enabled={this.state.enableInteractiveObject}
-							text="Lorem ipsum..."
-							type="BUBBLE"
-							onDragComplete={this.onDrawComplete}
-							textList={this.state.textList_3}
-						/>
-
-						<MACDTooltip
-							origin={[-38, 15]}
-							yAccessor={d => d.macd}
-							options={macdCalculator.options()}
-							appearance={macdAppearance}
-						/>
-					</Chart>
-					<CrossHairCursor />
-					<DrawingObjectSelector
-						enabled
-						getInteractiveNodes={this.getInteractiveNodes}
-						drawingObjectMap={{
-							InteractiveText: "textList"
-						}}
-						onSelect={this.handleSelection}
+					<MovingAverageTooltip
+						onClick={e => console.log(e)}
+						origin={[-38, 15]}
+						options={[
+							{
+								yAccessor: ema26.accessor(),
+								type: ema26.type(),
+								stroke: ema26.stroke(),
+								windowSize: ema26.options().windowSize,
+							},
+							{
+								yAccessor: ema12.accessor(),
+								type: ema12.type(),
+								stroke: ema12.stroke(),
+								windowSize: ema12.options().windowSize,
+							},
+						]}
 					/>
-				</ChartCanvas>
-				<Dialog
-					showModal={showModal}
-					text={text}
-					chartId={this.state.chartId}
-					onClose={this.handleDialogClose}
-					onSave={this.handleTextChange}
+					<EquidistantChannel
+						ref={this.saveInteractiveNodes("EquidistantChannel", 1)}
+						enabled={this.state.enableInteractiveObject}
+						onStart={() => console.log("START")}
+						onComplete={this.onDrawComplete}
+						channels={channels_1}
+						appearance= {{
+							stroke: "#990000",
+							strokeMedianOne: "#000099",
+							strokeMedianHalf: "#009B00",
+							strokeOpacity: 1,
+							strokeWidth: 1,
+							fill: "#8AAFE2",
+							fillOpacity: 0.6,
+							edgeStroke: "#000000",
+							edgeFill: "#FFFFFF",
+							edgeFill2: "#FFFFFF",
+							edgeStrokeWidth: 1,
+							r: 5,
+						}}
+					/>
+				</Chart>
+				<Chart id={2} height={150}
+					yExtents={[d => d.volume]}
+					origin={(w, h) => [0, h - 300]}
+				>
+					<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
+
+					<MouseCoordinateY
+						at="left"
+						orient="left"
+						displayFormat={format(".4s")} />
+
+					<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
+				</Chart>
+				<Chart id={3} height={150}
+					yExtents={macdCalculator.accessor()}
+					origin={(w, h) => [0, h - 150]} padding={{ top: 10, bottom: 10 }}
+				>
+					<XAxis axisAt="bottom" orient="bottom"/>
+					<YAxis axisAt="right" orient="right" ticks={2} />
+
+					<MouseCoordinateX
+						at="bottom"
+						orient="bottom"
+						displayFormat={timeFormat("%Y-%m-%d")} />
+					<MouseCoordinateY
+						at="right"
+						orient="right"
+						displayFormat={format(".2f")} />
+
+					<MACDSeries yAccessor={d => d.macd}
+						{...macdAppearance} />
+					<MACDTooltip
+						origin={[-38, 15]}
+						yAccessor={d => d.macd}
+						options={macdCalculator.options()}
+						appearance={macdAppearance}
+					/>
+				</Chart>
+				<CrossHairCursor />
+				<DrawingObjectSelector
+					enabled={!this.state.enableInteractiveObject}
+					getInteractiveNodes={this.getInteractiveNodes}
+					drawingObjectMap={{
+						EquidistantChannel: "channels"
+					}}
+					onSelect={this.handleSelection}
 				/>
-			</div>
+			</ChartCanvas>
 		);
 	}
 }
 
-
-CandleStickChartWithText.propTypes = {
+CandleStickChartWithEquidistantChannel.propTypes = {
 	data: PropTypes.array.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
-	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired
+	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired,
 };
 
-CandleStickChartWithText.defaultProps = {
-	type: "svg"
+CandleStickChartWithEquidistantChannel.defaultProps = {
+	type: "svg",
 };
 
-const CandleStickChart = fitWidth(
-	CandleStickChartWithText
-);
+CandleStickChartWithEquidistantChannel = fitWidth(CandleStickChartWithEquidistantChannel);
 
-export default CandleStickChart;
+export default CandleStickChartWithEquidistantChannel;

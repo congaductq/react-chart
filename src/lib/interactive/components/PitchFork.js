@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import GenericChartComponent from "../../GenericChartComponent";
 import { getMouseCanvas } from "../../GenericComponent";
 import { isDefined, noop, hexToRGBA } from "../../utils";
-import { getSlope, getYIntercept } from "./StraightLine";
+import { getSlope, getYIntercept, isHovering } from "./StraightLine";
 
 class ChannelWithArea extends Component {
 	constructor(props) {
@@ -14,10 +14,71 @@ class ChannelWithArea extends Component {
 		this.isHover = this.isHover.bind(this);
 	}
 	isHover(moreProps) {
+		const { startXY, endXY, finishXY, tolerance, onHover } = this.props;
+		if (isDefined(onHover) && finishXY) {
+			const { mouseXY, xScale, chartConfig: { yScale } } = moreProps;
+			const x1 = startXY[0];
+			const y1 = startXY[1];
+			const x2 = endXY[0];
+			const y2 = endXY[1];
+			const x3 = finishXY[0];
+			const y3 = finishXY[1];
+			const x4 = (x2 + x3) / 2;
+			const y4 = (y2 + y3) / 2;
+			const slope = getSlope([x1, y1], [x4, y4]);
+			const xDirection = x4 - x1 > 0;
+			const ray2 = this.getRayCoordinates({ end: [x2, y2], xDirection, slope });
+			const ray3 = this.getRayCoordinates({ end: [x3, y3], xDirection, slope });
+			const line14Hovering = isHovering({
+				x1Value: x1,
+				y1Value: y1,
+				x2Value: x4,
+				y2Value: y4,
+				type: "LINE",
+				mouseXY,
+				tolerance,
+				xScale,
+				yScale,
+			});
+			const line23Hovering = isHovering({
+				x1Value: x2,
+				y1Value: y2,
+				x2Value: x3,
+				y2Value: y3,
+				type: "LINE",
+				mouseXY,
+				tolerance,
+				xScale,
+				yScale,
+			});
+			const line2Hovering = isHovering({
+				x1Value: ray2.x1,
+				y1Value: ray2.y1,
+				x2Value: ray2.x2,
+				y2Value: ray2.y2,
+				type: "LINE",
+				mouseXY,
+				tolerance,
+				xScale,
+				yScale,
+			});
+			const line3Hovering = isHovering({
+				x1Value: ray3.x1,
+				y1Value: ray3.y1,
+				x2Value: ray3.x2,
+				y2Value: ray3.y2,
+				type: "LINE",
+				mouseXY,
+				tolerance,
+				xScale,
+				yScale,
+			});
+			return line2Hovering || line3Hovering || line23Hovering || line14Hovering;
+		}
 		return false;
 	}
 	drawOnCanvas(ctx, moreProps) {
-		const { stroke, strokeWidth, strokeOpacity, startXY, endXY, finishXY } = this.props;
+		const { stroke, strokeMedianOne, strokeMedianHalf, strokeWidth, strokeOpacity, fillOpacity, startXY, endXY, finishXY } = this.props;
 		const { xScale, chartConfig: { yScale } } = moreProps;
 		if (isDefined(endXY) && !isDefined(finishXY)) {
 			const x1 = xScale(startXY[0]);
@@ -54,7 +115,7 @@ class ChannelWithArea extends Component {
 			const ray6 = this.getRayCoordinates({ end: [x6, y6], xDirection, slope });
 
 			ctx.lineWidth = strokeWidth;
-			ctx.strokeStyle = hexToRGBA("#000000", strokeOpacity);
+			ctx.strokeStyle = hexToRGBA(stroke, strokeOpacity);
 			ctx.beginPath();
 			ctx.moveTo(x2, y2);
 			ctx.lineTo(x4, y4);
@@ -70,7 +131,7 @@ class ChannelWithArea extends Component {
 			ctx.lineTo(ray3.x2, ray3.y2);
 			ctx.stroke();
 
-			ctx.fillStyle = hexToRGBA("#ff0000", 0.2);
+			ctx.fillStyle = hexToRGBA(strokeMedianOne, fillOpacity);
 			ctx.beginPath();
 			ctx.moveTo(x2, y2);
 			ctx.lineTo(x5, y5);
@@ -83,7 +144,7 @@ class ChannelWithArea extends Component {
 			ctx.lineTo(ray6.x2, ray6.y2);
 			ctx.lineTo(ray3.x2, ray3.y2);
 			ctx.fill();
-			ctx.fillStyle = hexToRGBA("#00ff00", 0.2);
+			ctx.fillStyle = hexToRGBA(strokeMedianHalf, fillOpacity);
 			ctx.beginPath();
 			ctx.moveTo(x4, y4);
 			ctx.lineTo(x5, y5);
@@ -145,8 +206,13 @@ class ChannelWithArea extends Component {
 }
 
 ChannelWithArea.propTypes = {
-	interactiveCursorClass: PropTypes.string,
+	interactiveCursorClass: PropTypes.shape(),
+	startXY: PropTypes.shape(),
+	endXY: PropTypes.shape(),
+	finishXY: PropTypes.shape(),
 	stroke: PropTypes.string.isRequired,
+	strokeMedianOne: PropTypes.string.isRequired,
+	strokeMedianHalf: PropTypes.string.isRequired,
 	strokeWidth: PropTypes.number.isRequired,
 	fill: PropTypes.string.isRequired,
 	fillOpacity: PropTypes.number.isRequired,

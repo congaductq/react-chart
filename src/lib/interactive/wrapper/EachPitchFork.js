@@ -6,7 +6,7 @@ import { getXValue } from "../../utils/ChartDataUtil";
 import { saveNodeType, isHover } from "../utils";
 
 import ClickableCircle from "../components/ClickableCircle";
-import ChannelWithArea from "../components/PitchFork";
+import PitchFork from "../components/PitchFork";
 import HoverTextNearMouse from "../components/HoverTextNearMouse";
 
 class EachPitchFork extends Component {
@@ -70,7 +70,7 @@ class EachPitchFork extends Component {
 		const newEndX = getXValue(xScale, xAccessor, [x2 - dx, y2 - dy], fullData);
 		const newEndY = yScale.invert(y2 - dy);
 		const newFinishX = getXValue(xScale, xAccessor, [x3 - dx, y3 - dy], fullData);
-		const newFinishY = yScale.invert(y2 - dy);
+		const newFinishY = yScale.invert(y3 - dy);
 		onDrag(index, {
 			startXY: [newStartX, newStartY],
 			endXY: [newEndX, newEndY],
@@ -171,7 +171,7 @@ class EachPitchFork extends Component {
 		const { interactive, hoverText, appearance } = this.props;
 		const {
 			edgeFill, edgeFill2,
-			stroke, strokeWidth, strokeOpacity,
+			stroke, strokeMedianOne, strokeMedianHalf, strokeWidth, strokeOpacity,
 			fill, fillOpacity,
 		} = appearance;
 		const { selected } = this.props;
@@ -213,7 +213,7 @@ class EachPitchFork extends Component {
 			</g>
 			: null;
 		return <g>
-			<ChannelWithArea
+			<PitchFork
 				ref={this.saveNodeType("channel")}
 				selected={selected || hover}
 
@@ -223,6 +223,8 @@ class EachPitchFork extends Component {
 				endXY={endXY}
 				finishXY={finishXY}
 				stroke={stroke}
+				strokeMedianOne={strokeMedianOne}
+				strokeMedianHalf={strokeMedianHalf}
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
 				fill={fill}
@@ -252,6 +254,8 @@ EachPitchFork.propTypes = {
 
 	appearance: PropTypes.shape({
 		stroke: PropTypes.string.isRequired,
+		strokeMedianOne: PropTypes.string.isRequired,
+		strokeMedianHalf: PropTypes.string.isRequired,
 		fillOpacity: PropTypes.number.isRequired,
 		strokeOpacity: PropTypes.number.isRequired,
 		strokeWidth: PropTypes.number.isRequired,

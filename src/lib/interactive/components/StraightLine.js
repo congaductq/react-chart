@@ -201,7 +201,6 @@ export function generateLine({
 	const m /* slope */ = getSlope(start, end);
 	// console.log(end[0] - start[0], m)
 	const b /* y intercept */ = getYIntercept(m, start);
-	console.log(type)
 	switch (type) {
 		case "XLINE":
 			return getXLineCoordinates({
