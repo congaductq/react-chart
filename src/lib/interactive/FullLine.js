@@ -3,24 +3,24 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import { isDefined, isNotDefined, noop } from "../utils";
+import { isDefined, noop } from "../utils";
 import {
 	terminate,
 	saveNodeType,
 	isHoverForInteractiveType,
 } from "./utils";
-import EachPitchFork from "./wrapper/EachPitchFork";
+import EachFullLine from "./wrapper/EachFullLine";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
 
-class PitchFork extends Component {
+class FullLine extends Component {
 	constructor(props) {
 		super(props);
 
 		this.handleStart = this.handleStart.bind(this);
 		this.handleEnd = this.handleEnd.bind(this);
-		this.handleDragChannel = this.handleDragChannel.bind(this);
 		this.handleDrawChannel = this.handleDrawChannel.bind(this);
+		this.handleDragChannel = this.handleDragChannel.bind(this);
 		this.handleDragChannelComplete = this.handleDragChannelComplete.bind(this);
 
 		this.terminate = terminate.bind(this);
@@ -59,97 +59,62 @@ class PitchFork extends Component {
 		}
 	}
 	handleDrawChannel(xyValue) {
-		const { current } = this.state;
-		if (isDefined(current)
-				&& isDefined(current.startXY)) {
-			this.mouseMoved = true;
-			if (isNotDefined(current.finishXY)) {
-				this.setState({
-					current: {
-						startXY: current.startXY,
-						endXY: xyValue,
-					}
-				});
-			} else {
-				this.setState({
-					current: {
-						...current,
-						finishXY: xyValue,
-					}
-				});
-			}
-		}
+    this.mouseMoved = true;
+		this.setState({
+      current: {
+        startXY: xyValue,
+      }
+    });
 	}
 	handleStart(xyValue) {
-		const { current } = this.state;
-		if (isNotDefined(current) || isNotDefined(current.startXY)) {
-			this.mouseMoved = false;
-			this.setState({
-				current: {
-					startXY: xyValue,
-					endXY: null,
-				}
-			}, () => {
-				this.props.onStart();
-			});
-		}
+    this.mouseMoved = false;
+    this.setState({
+      current: {
+        startXY: xyValue,
+      }
+    }, () => {
+      this.props.onStart();
+    });
 	}
 	handleEnd(xyValue, moreProps, e) {
-		const { current } = this.state;
 		const { channels, appearance } = this.props;
-		if (this.mouseMoved
-			&& isDefined(current)
-			&& isDefined(current.startXY)
-		) {
-			if (isNotDefined(current.finishXY)) {
-				this.setState({
-					current: {
-						...current,
-						finishXY: [current.endXY[0], current.endXY[1]],
-					}
-				});
-			} else {
-				const newChannels = [
-					...channels.map(d => ({ ...d, selected: false })),
-					{
-						...current, selected: true,
-						appearance,
-					}
-				];
-
-				this.setState({
-					current: null,
-				}, () => {
-
-					this.props.onComplete(newChannels, moreProps, e);
-				});
-			}
-		}
+    const newChannels = [
+      ...channels.map(d => ({ ...d, selected: false })),
+      {
+				selected: true,
+				startXY: xyValue,
+        appearance,
+      }
+		];
+    this.setState({
+      current: null,
+    }, () => {
+      this.props.onComplete(newChannels, moreProps, e);
+    });
 	}
 	render() {
-		const { appearance, type, enabled, currentPositionRadius, currentPositionStroke,
-			currentPositionOpacity, currentPositionStrokeWidth, channels, hoverText
-		} = this.props;
+    const { appearance, enabled, currentPositionRadius, currentPositionStroke,
+      currentPositionOpacity, currentPositionStrokeWidth, channels, hoverText, type
+    } = this.props;
 		const { current, override } = this.state;
 		const overrideIndex = isDefined(override) ? override.index : null;
-		const tempChannel = isDefined(current) && isDefined(current.endXY)
-			? <EachPitchFork
-				type={type}
-				interactive={false}
+		const tempChannel = isDefined(current)
+			? <EachFullLine
+        type={type}
+        interactive={false}
 				{...current}
 				appearance={appearance}
 				hoverText={hoverText} />
 			: null;
-
 		return <g>
 			{channels.map((each, idx) => {
+				console.log(each)
 				const eachAppearance = isDefined(each.appearance)
 					? { ...appearance, ...each.appearance }
 					: appearance;
 
-				return <EachPitchFork
-					key={idx}
-					type={type}
+        return <EachFullLine key={idx}
+          type={type}
 					ref={this.saveNodeType(idx)}
 					index={idx}
 					selected={each.selected}
@@ -176,11 +141,11 @@ class PitchFork extends Component {
 }
 
 
-PitchFork.propTypes = {
+FullLine.propTypes = {
 	type: PropTypes.oneOf([
-		"PITCHFORK", // extends from -Infinity to +Infinity
-		"TRIANGLE", // extends to +/-Infinity in one direction
-	]),
+		"VERTICAL",
+		"HORIZONTAL",
+	]).isRequired,
 	enabled: PropTypes.bool.isRequired,
 
 	onStart: PropTypes.func.isRequired,
@@ -209,8 +174,8 @@ PitchFork.propTypes = {
 	}).isRequired
 };
 
-PitchFork.defaultProps = {
-	type: "PITCHFORK",
+FullLine.defaultProps = {
+  type: "VERTICAL",
 	onStart: noop,
 	onComplete: noop,
 	onSelect: noop,
@@ -229,19 +194,17 @@ PitchFork.defaultProps = {
 	},
 	channels: [],
 	appearance: {
-		stroke: "#990000",
-		strokeMedianOne: "#000099",
-		strokeMedianHalf: "#009B00",
+		stroke: "#000000",
 		strokeOpacity: 1,
 		strokeWidth: 1,
 		fill: "#8AAFE2",
-		fillOpacity: 0.6,
+		fillOpacity: 0.7,
 		edgeStroke: "#000000",
 		edgeFill: "#FFFFFF",
-		edgeFill2: "#FFFFFF",
+		edgeFill2: "#250B98",
 		edgeStrokeWidth: 1,
 		r: 5,
 	}
 };
 
-export default PitchFork;
+export default FullLine;

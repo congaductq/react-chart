@@ -132,7 +132,8 @@ class TrendLine extends Component {
 		const { current, override } = this.state;
 
 		const tempLine = isDefined(current) && isDefined(current.end)
-			? <StraightLine type={type}
+			? <StraightLine
+				type={type}
 				noHover
 				x1Value={current.start[0]}
 				y1Value={current.start[1]}

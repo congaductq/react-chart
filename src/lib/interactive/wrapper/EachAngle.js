@@ -141,6 +141,8 @@ class EachAngle extends Component {
 			strokeOpacity,
 			strokeDasharray,
 			r,
+			fill,
+			fillOpacity,
 			edgeStrokeWidth,
 			edgeFill,
 			edgeStroke,
@@ -171,6 +173,8 @@ class EachAngle extends Component {
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
 				strokeDasharray={strokeDasharray}
+				fill={fill}
+				fillOpacity={fillOpacity}
 				interactiveCursorClass={lineInteractiveCursor}
 				onDragStart={this.handleLineDragStart}
 				onDrag={this.handleLineDrag}
@@ -232,9 +236,9 @@ EachAngle.propTypes = {
 	index: PropTypes.number,
 
 	type: PropTypes.oneOf([
-		"XLINE", // extends from -Infinity to +Infinity
-		"RAY", // extends to +/-Infinity in one direction
-		"LINE", // extends between the set bounds
+		"ANGLE",
+		"RECTANGLE",
+		"CIRCLE",
 	]).isRequired,
 
 	onDrag: PropTypes.func.isRequired,
@@ -260,6 +264,8 @@ EachAngle.propTypes = {
 	lineInteractiveCursor: PropTypes.string.isRequired,
 	edgeFill: PropTypes.string.isRequired,
 	hoverText: PropTypes.object.isRequired,
+	fill: PropTypes.string.isRequired,
+	fillOpacity: PropTypes.number.isRequired,
 };
 
 EachAngle.defaultProps = {
@@ -276,6 +282,8 @@ EachAngle.defaultProps = {
 	edgeFill: "#FFFFFF",
 	edgeStrokeWidth: 2,
 	r: 5,
+	fill: "#8AAFE2",
+	fillOpacity: 0.6,
 	strokeWidth: 1,
 	strokeOpacity: 1,
 	strokeDasharray: "Solid",

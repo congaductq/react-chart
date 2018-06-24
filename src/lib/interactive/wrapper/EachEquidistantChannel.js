@@ -215,7 +215,6 @@ class EachEquidistantChannel extends Component {
 				})}
 			</g>
 			: null;
-		
 		const line2Edge = isDefined(dy)
 			? <g>
 				{this.getEdgeCircle({

@@ -48,7 +48,7 @@ class Angle extends Component {
 	handleDragLineComplete(moreProps) {
 		const { override } = this.state;
 		if (isDefined(override)) {
-      const { trends } = this.props;
+			const { trends } = this.props;
 			const newTrends = trends
 				.map((each, idx) => idx === override.index
 					? {
@@ -98,8 +98,8 @@ class Angle extends Component {
 		}
 	}
 	handleEnd(xyValue, moreProps, e) {
-    const { trends, appearance, type } = this.props;
 		const { current } = this.state;
+		const { trends, appearance, type } = this.props;
 
 		if (this.mouseMoved
 			&& isDefined(current)
@@ -129,7 +129,7 @@ class Angle extends Component {
 		const { currentPositionRadius, currentPositionStroke } = this.props;
 		const { currentPositionstrokeOpacity, currentPositionStrokeWidth } = this.props;
 		const { hoverText, trends } = this.props;
-    const { current, override } = this.state;
+		const { current, override } = this.state;
 
 		const tempLine = isDefined(current) && isDefined(current.end)
 			? <AngleComponent type={type}
@@ -140,7 +140,10 @@ class Angle extends Component {
 				y2Value={current.end[1]}
 				stroke={appearance.stroke}
 				strokeWidth={appearance.strokeWidth}
-				strokeOpacity={appearance.strokeOpacity} />
+				strokeOpacity={appearance.strokeOpacity}
+				fill={appearance.fill}
+				fillOpacity={appearance.fillOpacity}
+			/>
 			: null;
 
 		return <g>
@@ -165,6 +168,8 @@ class Angle extends Component {
 					edgeFill={eachAppearance.edgeFill}
 					edgeStrokeWidth={eachAppearance.edgeStrokeWidth}
 					r={eachAppearance.r}
+					fill={eachAppearance.fill}
+					fillOpacity={eachAppearance.fillOpacity}
 					hoverText={hoverText}
 					onDrag={this.handleDragLine}
 					onDragComplete={this.handleDragLineComplete}
@@ -206,9 +211,9 @@ Angle.propTypes = {
 	currentPositionstrokeOpacity: PropTypes.number,
 	currentPositionRadius: PropTypes.number,
 	type: PropTypes.oneOf([
-		"XLINE", // extends from -Infinity to +Infinity
-		"RAY", // extends to +/-Infinity in one direction
-		"LINE", // extends between the set bounds
+		"ANGLE",
+		"RECTANGLE",
+		"CIRCLE",
 	]),
 	hoverText: PropTypes.object.isRequired,
 
@@ -222,6 +227,8 @@ Angle.propTypes = {
 		edgeStrokeWidth: PropTypes.number.isRequired,
 		edgeFill: PropTypes.string.isRequired,
 		edgeStroke: PropTypes.string.isRequired,
+		fill: PropTypes.string.isRequired,
+		fillOpacity: PropTypes.number.isRequired,
 	}).isRequired
 };
 
@@ -256,6 +263,8 @@ Angle.defaultProps = {
 		edgeFill: "#FFFFFF",
 		edgeStroke: "#000000",
 		r: 6,
+		fill: "#8AAFE2",
+		fillOpacity: 0.6,
 	}
 };
 

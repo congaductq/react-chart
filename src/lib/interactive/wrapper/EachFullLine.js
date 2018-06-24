@@ -6,18 +6,18 @@ import { getXValue } from "../../utils/ChartDataUtil";
 import { saveNodeType, isHover } from "../utils";
 
 import ClickableCircle from "../components/ClickableCircle";
-import PitchFork from "../components/PitchFork";
+import FullLineComponent from "../components/FullLine";
 import HoverTextNearMouse from "../components/HoverTextNearMouse";
 
-class EachPitchFork extends Component {
+class FullLine extends Component {
 	constructor(props) {
 		super(props);
 
-		this.handleChangeStart = this.handleChangeStart.bind(this);
-		this.handleChangeEnd = this.handleChangeEnd.bind(this);
-		this.handleChangeFinish = this.handleChangeFinish.bind(this);
+		this.handleLineDrag = this.handleLineDrag.bind(this);
+
 		this.handleDragStart = this.handleDragStart.bind(this);
 		this.handleChannelDrag = this.handleChannelDrag.bind(this);
+
 		this.getEdgeCircle = this.getEdgeCircle.bind(this);
 		this.handleHover = this.handleHover.bind(this);
 
@@ -30,6 +30,7 @@ class EachPitchFork extends Component {
 		};
 	}
 	handleHover(moreProps) {
+		console.log('hov')
 		if (this.state.hover !== moreProps.hovering) {
 			this.setState({
 				hover: moreProps.hovering
@@ -38,18 +39,19 @@ class EachPitchFork extends Component {
 	}
 	handleDragStart() {
 		const {
-			startXY, endXY, finishXY,
+			startXY
 		} = this.props;
 
 		this.dragStart = {
-			startXY, endXY, finishXY,
+			startXY
 		};
 	}
 	handleChannelDrag(moreProps) {
+		console.log('dr')
 		const { index, onDrag } = this.props;
 
 		const {
-			startXY, endXY, finishXY,
+			startXY
 		} = this.dragStart;
 
 		const { xScale, chartConfig: { yScale }, xAccessor, fullData } = moreProps;
@@ -57,91 +59,41 @@ class EachPitchFork extends Component {
 
 		const x1 = xScale(startXY[0]);
 		const y1 = yScale(startXY[1]);
-		const x2 = xScale(endXY[0]);
-		const y2 = yScale(endXY[1]);
-		const x3 = xScale(finishXY[0]);
-		const y3 = yScale(finishXY[1]);
 
 		const dx = startPos[0] - mouseXY[0];
 		const dy = startPos[1] - mouseXY[1];
 
-		const newStartX = getXValue(xScale, xAccessor, [x1 - dx, y1 - dy], fullData);
-		const newStartY = yScale.invert(y1 - dy);
-		const newEndX = getXValue(xScale, xAccessor, [x2 - dx, y2 - dy], fullData);
-		const newEndY = yScale.invert(y2 - dy);
-		const newFinishX = getXValue(xScale, xAccessor, [x3 - dx, y3 - dy], fullData);
-		const newFinishY = yScale.invert(y3 - dy);
+		const newX1Value = getXValue(xScale, xAccessor, [x1 - dx, y1 - dy], fullData);
+		const newY1Value = yScale.invert(y1 - dy);
+
 		onDrag(index, {
-			startXY: [newStartX, newStartY],
-			endXY: [newEndX, newEndY],
-			finishXY: [newFinishX, newFinishY],
+			startXY: [newX1Value, newY1Value],
 		});
 	}
-	handleChangeStart(moreProps) {
+	handleLineDrag(moreProps) {
+		console.log('ld')
 		const { index, onDrag } = this.props;
-
 		const {
-			startXY, endXY, finishXY,
+			startXY,
 		} = this.dragStart;
 
-		const { xScale, chartConfig: { yScale }, xAccessor, fullData } = moreProps;
-		const { startPos, mouseXY } = moreProps;
-
-		const x2 = xScale(startXY[0]);
-		const y2 = yScale(startXY[1]);
+		const {
+			startPos, mouseXY, xAccessor,
+			xScale, fullData,
+			chartConfig: { yScale }
+		} = moreProps;
 
 		const dx = startPos[0] - mouseXY[0];
 		const dy = startPos[1] - mouseXY[1];
 
-		const newFinishX = getXValue(xScale, xAccessor, [x2 - dx, y2 - dy], fullData);
-		const newFinishY = yScale.invert(y2 - dy);
-		onDrag(index, { endXY, finishXY,
-			startXY: [newFinishX, newFinishY],
-		});
-	}
-	handleChangeEnd(moreProps) {
-		const { index, onDrag } = this.props;
+		const x1 = xScale(startXY[0]);
+		const y1 = yScale(startXY[1]);
 
-		const {
-			startXY, endXY, finishXY,
-		} = this.dragStart;
+		const newX1Value = getXValue(xScale, xAccessor, [x1 - dx, y1 - dy], fullData);
+		const newY1Value = yScale.invert(y1 - dy);
 
-		const { xScale, chartConfig: { yScale }, xAccessor, fullData } = moreProps;
-		const { startPos, mouseXY } = moreProps;
-
-		const x2 = xScale(endXY[0]);
-		const y2 = yScale(endXY[1]);
-
-		const dx = startPos[0] - mouseXY[0];
-		const dy = startPos[1] - mouseXY[1];
-
-		const newFinishX = getXValue(xScale, xAccessor, [x2 - dx, y2 - dy], fullData);
-		const newFinishY = yScale.invert(y2 - dy);
-		onDrag(index, { startXY, finishXY,
-			endXY: [newFinishX, newFinishY],
-		});
-	}
-	handleChangeFinish(moreProps) {
-		const { index, onDrag } = this.props;
-
-		const {
-			startXY, endXY, finishXY,
-		} = this.dragStart;
-
-		const { xScale, chartConfig: { yScale }, xAccessor, fullData } = moreProps;
-		const { startPos, mouseXY } = moreProps;
-
-		const x2 = xScale(finishXY[0]);
-		const y2 = yScale(finishXY[1]);
-
-		const dx = startPos[0] - mouseXY[0];
-		const dy = startPos[1] - mouseXY[1];
-
-		const newFinishX = getXValue(xScale, xAccessor, [x2 - dx, y2 - dy], fullData);
-		const newFinishY = yScale.invert(y2 - dy);
-
-		onDrag(index, { startXY, endXY,
-			finishXY: [newFinishX, newFinishY],
+		onDrag(index, {
+			startXY: [newX1Value, newY1Value],
 		});
 	}
 	getEdgeCircle({ xy, dragHandler, cursor, fill, edge }) {
@@ -150,8 +102,10 @@ class EachPitchFork extends Component {
 		const { edgeStroke, edgeStrokeWidth, r } = appearance;
 		const { selected } = this.props;
 		const { onDragComplete } = this.props;
+
 		return <ClickableCircle
 			ref={this.saveNodeType(edge)}
+
 			show={selected || hover}
 			cx={xy[0]}
 			cy={xy[1]}
@@ -166,13 +120,15 @@ class EachPitchFork extends Component {
 			onDragComplete={onDragComplete} />;
 	}
 	render() {
-		const { startXY, endXY, finishXY, type, interactive, hoverText, appearance, selected, onDragComplete } = this.props;
-
+		const { startXY } = this.props;
+		const { interactive, hoverText, appearance } = this.props;
 		const {
-			edgeFill, edgeFill2,
-			stroke, strokeMedianOne, strokeMedianHalf, strokeWidth, strokeOpacity,
+			edgeFill,
+			stroke, strokeWidth, strokeOpacity,
 			fill, fillOpacity,
 		} = appearance;
+		const { selected } = this.props;
+		const { onDragComplete } = this.props;
 		const { hover } = this.state;
 		const { enable: hoverTextEnabled, ...restHoverTextProps } = hoverText;
 
@@ -180,49 +136,26 @@ class EachPitchFork extends Component {
 			? { onHover: this.handleHover, onUnHover: this.handleHover }
 			: {};
 
-		const startEdge = isDefined(startXY) && isDefined(endXY)
+		const line1Edge = isDefined(startXY)
 			? <g>
 				{this.getEdgeCircle({
 					xy: startXY,
-					dragHandler: this.handleChangeStart,
+					dragHandler: this.handleLineDrag,
 					cursor: "react-stockcharts-move-cursor",
 					fill: edgeFill,
-					edge: "startEdge",
-				})}
-				{this.getEdgeCircle({
-					xy: endXY,
-					dragHandler: this.handleChangeEnd,
-					cursor: "react-stockcharts-move-cursor",
-					fill: edgeFill,
-					edge: "endEdge",
-				})}
-			</g>
-			: null;
-		const endEdge = isDefined(finishXY)
-			? <g>
-				{this.getEdgeCircle({
-					xy: finishXY,
-					dragHandler: this.handleChangeFinish,
-					cursor: "react-stockcharts-move-cursor",
-					fill: edgeFill2,
-					edge: "finishEdge",
+					edge: "edge",
 				})}
 			</g>
 			: null;
 		return <g>
-			<PitchFork
+			<FullLineComponent
 				ref={this.saveNodeType("channel")}
 				selected={selected || hover}
 
 				{...hoverHandler}
 
 				startXY={startXY}
-				endXY={endXY}
-				finishXY={finishXY}
-				type={type}
 				stroke={stroke}
-				strokeMedianOne={strokeMedianOne}
-				strokeMedianHalf={strokeMedianHalf}
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
 				fill={fill}
@@ -232,8 +165,7 @@ class EachPitchFork extends Component {
 				onDrag={this.handleChannelDrag}
 				onDragComplete={onDragComplete}
 			/>
-			{startEdge}
-			{endEdge}
+			{line1Edge}
 			<HoverTextNearMouse
 				show={hoverTextEnabled && hover && !selected}
 				{...restHoverTextProps} />
@@ -241,23 +173,14 @@ class EachPitchFork extends Component {
 	}
 }
 
-EachPitchFork.propTypes = {
-	type: PropTypes.oneOf([
-		"PITCHFORK", // extends from -Infinity to +Infinity
-		"TRIANGLE", // extends to +/-Infinity in one direction
-	]),
+FullLine.propTypes = {
 	startXY: PropTypes.arrayOf(PropTypes.number).isRequired,
-	endXY: PropTypes.arrayOf(PropTypes.number).isRequired,
-	finishXY: PropTypes.arrayOf(PropTypes.number),
-
 	interactive: PropTypes.bool.isRequired,
 	selected: PropTypes.bool.isRequired,
 	hoverText: PropTypes.object.isRequired,
 
 	appearance: PropTypes.shape({
 		stroke: PropTypes.string.isRequired,
-		strokeMedianOne: PropTypes.string.isRequired,
-		strokeMedianHalf: PropTypes.string.isRequired,
 		fillOpacity: PropTypes.number.isRequired,
 		strokeOpacity: PropTypes.number.isRequired,
 		strokeWidth: PropTypes.number.isRequired,
@@ -274,7 +197,7 @@ EachPitchFork.propTypes = {
 	onDragComplete: PropTypes.func.isRequired,
 };
 
-EachPitchFork.defaultProps = {
+FullLine.defaultProps = {
 	yDisplayFormat: d => d.toFixed(2),
 	interactive: true,
 	selected: false,
@@ -286,4 +209,4 @@ EachPitchFork.defaultProps = {
 	}
 };
 
-export default EachPitchFork;
+export default FullLine;

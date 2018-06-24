@@ -29,8 +29,9 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { PitchFork as EquidistantChannel, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { FullLine as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
+
 import {
 	saveInteractiveNodes,
 	getInteractiveNodes,
@@ -46,26 +47,35 @@ const macdAppearance = {
 	},
 };
 
-class CandleStickChartWithEquidistantChannel extends React.Component {
+class CandlestickChart extends React.Component {
 	constructor(props) {
 		super(props);
 		this.onKeyPress = this.onKeyPress.bind(this);
-		this.onDrawComplete = this.onDrawComplete.bind(this);
-		this.saveInteractiveNode = this.saveInteractiveNode.bind(this);
-		this.saveCanvasNode = this.saveCanvasNode.bind(this);
+		this.onDrawCompleteChart1 = this.onDrawCompleteChart1.bind(this);
+		this.onDrawCompleteChart3 = this.onDrawCompleteChart3.bind(this);
 		this.handleSelection = this.handleSelection.bind(this);
 
 		this.saveInteractiveNodes = saveInteractiveNodes.bind(this);
 		this.getInteractiveNodes = getInteractiveNodes.bind(this);
 
+		this.saveCanvasNode = this.saveCanvasNode.bind(this);
+
 		this.state = {
-			enableInteractiveObject: true,
-			channels_1: [],
-			channels_3: [],
+			enableTrendLine: true,
+			trends_1: [
+				{ startXY: [1606, 56], appearance: { stroke: "#000000",
+				strokeOpacity: 1,
+				strokeWidth: 1,
+				fill: "#8AAFE2",
+				fillOpacity: 0.7,
+				edgeStroke: "#000000",
+				edgeFill: "#FFFFFF",
+				edgeFill2: "#250B98",
+				edgeStrokeWidth: 1,
+				r: 5, }, type: "VERTICAL" }
+			],
+			trends_3: []
 		};
-	}
-	saveInteractiveNode(node) {
-		this.node = node;
 	}
 	saveCanvasNode(node) {
 		this.canvasNode = node;
@@ -79,19 +89,30 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	handleSelection(interactives) {
 		const state = toObject(interactives, each => {
 			return [
-				`channels_${each.chartId}`,
+				`trends_${each.chartId}`,
 				each.objects,
 			];
 		});
 		this.setState(state);
 	}
-	onDrawComplete(channels_1) {
+	onDrawCompleteChart1(trends_1) {
 		// this gets called on
-		// 1. draw complete of drawing object
-		// 2. drag complete of drawing object
+		// 1. draw complete of trendline
+		// 2. drag complete of trendline
+		console.log(trends_1);
 		this.setState({
-			enableInteractiveObject: false,
-			channels_1
+			enableTrendLine: false,
+			trends_1
+		});
+	}
+	onDrawCompleteChart3(trends_3) {
+		// this gets called on
+		// 1. draw complete of trendline
+		// 2. drag complete of trendline
+		console.log(trends_3);
+		this.setState({
+			enableTrendLine: false,
+			trends_3
 		});
 	}
 	onKeyPress(e) {
@@ -100,31 +121,31 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		switch (keyCode) {
 		case 46: { // DEL
 
-			const channels_1 = this.state.channels_1
+			const trends_1 = this.state.trends_1
 				.filter(each => !each.selected);
-			const channels_3 = this.state.channels_3
+			const trends_3 = this.state.trends_3
 				.filter(each => !each.selected);
 
 			this.canvasNode.cancelDrag();
 			this.setState({
-				channels_1,
-				channels_3,
+				trends_1,
+				trends_3,
 			});
 			break;
 		}
 		case 27: { // ESC
-			this.node.terminate();
+			this.node_1.terminate();
+			this.node_3.terminate();
 			this.canvasNode.cancelDrag();
-
 			this.setState({
-				enableInteractiveObject: false
+				enableTrendLine: false
 			});
 			break;
 		}
-		case 68:   // D - Draw drawing object
-		case 69: { // E - Enable drawing object
+		case 68:   // D - Draw trendline
+		case 69: { // E - Enable trendline
 			this.setState({
-				enableInteractiveObject: true
+				enableTrendLine: true
 			});
 			break;
 		}
@@ -153,7 +174,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 			.accessor(d => d.macd);
 
 		const { type, data: initialData, width, ratio } = this.props;
-		const { channels_1, channels_3 } = this.state;
 
 		const calculatedData = macdCalculator(ema12(ema26(initialData)));
 		const xScaleProvider = discontinuousTimeScaleProvider
@@ -168,7 +188,6 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 		const start = xAccessor(last(data));
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
-
 		return (
 			<ChartCanvas ref={this.saveCanvasNode}
 				height={600}
@@ -224,26 +243,15 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 							},
 						]}
 					/>
-					<EquidistantChannel
-						ref={this.saveInteractiveNodes("EquidistantChannel", 1)}
-						enabled={this.state.enableInteractiveObject}
+					<TrendLine
+						ref={this.saveInteractiveNodes("Trendline", 1)}
+						enabled={this.state.enableTrendLine}
+						type="VERTICAL"
+						snap={false}
+						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}
-						onComplete={this.onDrawComplete}
-						channels={channels_1}
-						appearance= {{
-							stroke: "#990000",
-							strokeMedianOne: "#000099",
-							strokeMedianHalf: "#009B00",
-							strokeOpacity: 1,
-							strokeWidth: 1,
-							fill: "#8AAFE2",
-							fillOpacity: 0.6,
-							edgeStroke: "#000000",
-							edgeFill: "#FFFFFF",
-							edgeFill2: "#FFFFFF",
-							edgeStrokeWidth: 1,
-							r: 5,
-						}}
+						onComplete={this.onDrawCompleteChart1}
+						channels={this.state.trends_1}
 					/>
 				</Chart>
 				<Chart id={2} height={150}
@@ -274,7 +282,16 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 						at="right"
 						orient="right"
 						displayFormat={format(".2f")} />
-
+					<TrendLine
+						ref={this.saveInteractiveNodes("Trendline", 3)}
+						enabled={this.state.enableTrendLine}
+						type="RAY"
+						snap={false}
+						snapTo={d => [d.high, d.low]}
+						onStart={() => console.log("START")}
+						onComplete={this.onDrawCompleteChart3}
+						trends={this.state.trends_3}
+					/>
 					<MACDSeries yAccessor={d => d.macd}
 						{...macdAppearance} />
 					<MACDTooltip
@@ -286,10 +303,10 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 				</Chart>
 				<CrossHairCursor />
 				<DrawingObjectSelector
-					enabled={!this.state.enableInteractiveObject}
+					enabled={!this.state.enableTrendLine}
 					getInteractiveNodes={this.getInteractiveNodes}
 					drawingObjectMap={{
-						EquidistantChannel: "channels"
+						Trendline: "trends"
 					}}
 					onSelect={this.handleSelection}
 				/>
@@ -298,17 +315,17 @@ class CandleStickChartWithEquidistantChannel extends React.Component {
 	}
 }
 
-CandleStickChartWithEquidistantChannel.propTypes = {
+CandlestickChart.propTypes = {
 	data: PropTypes.array.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired,
 };
 
-CandleStickChartWithEquidistantChannel.defaultProps = {
+CandlestickChart.defaultProps = {
 	type: "svg",
 };
 
-CandleStickChartWithEquidistantChannel = fitWidth(CandleStickChartWithEquidistantChannel);
+const CandleStickChartWithInteractiveIndicator = fitWidth(CandlestickChart);
 
-export default CandleStickChartWithEquidistantChannel;
+export default CandleStickChartWithInteractiveIndicator;
