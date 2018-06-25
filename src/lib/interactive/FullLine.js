@@ -12,6 +12,8 @@ import {
 import EachFullLine from "./wrapper/EachFullLine";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
+import GenericChartComponent from "../GenericChartComponent";
+import { getMouseCanvas } from "../GenericComponent";
 
 class FullLine extends Component {
 	constructor(props) {
@@ -26,7 +28,7 @@ class FullLine extends Component {
 		this.terminate = terminate.bind(this);
 		this.saveNodeType = saveNodeType.bind(this);
 
-		this.getSelectionState = isHoverForInteractiveType("channels")
+		this.getSelectionState = isHoverForInteractiveType("trends")
 			.bind(this);
 
 		this.nodes = [];
@@ -43,78 +45,77 @@ class FullLine extends Component {
 	}
 	handleDragChannelComplete(moreProps) {
 		const { override } = this.state;
-		const { channels } = this.props;
-
+		const { trends } = this.props;
 		if (isDefined(override)) {
 			const { index, ...rest } = override;
-			const newChannels = channels
+			const newTrends = trends
 				.map((each, idx) => idx === index
 					? { ...each, ...rest, selected: true }
 					: each);
 			this.setState({
 				override: null,
 			}, () => {
-				this.props.onComplete(newChannels, moreProps);
+				this.props.onComplete(newTrends, moreProps);
 			});
 		}
 	}
 	handleDrawChannel(xyValue) {
-    this.mouseMoved = true;
+		this.mouseMoved = true;
 		this.setState({
-      current: {
-        startXY: xyValue,
-      }
-    });
+			current: {
+				startXY: xyValue,
+			}
+		});
 	}
-	handleStart(xyValue) {
-    this.mouseMoved = false;
-    this.setState({
-      current: {
-        startXY: xyValue,
-      }
-    }, () => {
-      this.props.onStart();
-    });
+	handleStart(xyValue, moreProps, e) {
+		this.mouseMoved = false;
+		this.setState({
+			current: {
+				startXY: xyValue,
+			}
+		}, () => {
+			this.props.onStart(moreProps, e);
+		});
 	}
 	handleEnd(xyValue, moreProps, e) {
-		const { channels, appearance } = this.props;
-    const newChannels = [
-      ...channels.map(d => ({ ...d, selected: false })),
-      {
+		const { trends, appearance, type } = this.props;
+		const newTrends = [
+			...trends.map(d => ({ ...d, selected: false })),
+			{
 				selected: true,
 				startXY: xyValue,
-        appearance,
-      }
+				appearance,
+				type,
+			}
 		];
-    this.setState({
-      current: null,
-    }, () => {
-      this.props.onComplete(newChannels, moreProps, e);
-    });
+		this.setState({
+			current: null,
+			trends: newTrends
+		}, () => {
+			this.props.onComplete(newTrends, moreProps, e);
+		});
 	}
 	render() {
-    const { appearance, enabled, currentPositionRadius, currentPositionStroke,
-      currentPositionOpacity, currentPositionStrokeWidth, channels, hoverText, type
-    } = this.props;
+		const { appearance, enabled, currentPositionRadius, currentPositionStroke,
+			currentPositionOpacity, currentPositionStrokeWidth, trends, hoverText, type
+		} = this.props;
 		const { current, override } = this.state;
 		const overrideIndex = isDefined(override) ? override.index : null;
 		const tempChannel = isDefined(current)
 			? <EachFullLine
-        type={type}
-        interactive={false}
+				type={type}
+				interactive={false}
 				{...current}
 				appearance={appearance}
 				hoverText={hoverText} />
 			: null;
 		return <g>
-			{channels.map((each, idx) => {
-				console.log(each)
+			{trends.map((each, idx) => {
 				const eachAppearance = isDefined(each.appearance)
 					? { ...appearance, ...each.appearance }
 					: appearance;
-
-        return <EachFullLine key={idx}
-          type={type}
+				return <EachFullLine key={idx}
+					type={each.type}
 					ref={this.saveNodeType(idx)}
 					index={idx}
 					selected={each.selected}
@@ -133,9 +134,9 @@ class FullLine extends Component {
 				stroke={currentPositionStroke}
 				opacity={currentPositionOpacity}
 				strokeWidth={currentPositionStrokeWidth}
-				onMouseDown={this.handleStart}
 				onClick={this.handleEnd}
-				onMouseMove={this.handleDrawChannel} />
+				onMouseMove={this.handleDrawChannel}
+			/>
 		</g>;
 	}
 }
@@ -158,7 +159,7 @@ FullLine.propTypes = {
 	currentPositionRadius: PropTypes.number,
 
 	hoverText: PropTypes.object.isRequired,
-	channels: PropTypes.array.isRequired,
+	trends: PropTypes.array.isRequired,
 
 	appearance: PropTypes.shape({
 		stroke: PropTypes.string.isRequired,
@@ -175,7 +176,7 @@ FullLine.propTypes = {
 };
 
 FullLine.defaultProps = {
-  type: "VERTICAL",
+	type: "VERTICAL",
 	onStart: noop,
 	onComplete: noop,
 	onSelect: noop,
@@ -192,7 +193,7 @@ FullLine.defaultProps = {
 		bgWidth: 120,
 		text: "Click to select object",
 	},
-	channels: [],
+	trends: [],
 	appearance: {
 		stroke: "#000000",
 		strokeOpacity: 1,

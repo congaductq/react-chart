@@ -30,7 +30,6 @@ class FullLine extends Component {
 		};
 	}
 	handleHover(moreProps) {
-		console.log('hov')
 		if (this.state.hover !== moreProps.hovering) {
 			this.setState({
 				hover: moreProps.hovering
@@ -47,7 +46,6 @@ class FullLine extends Component {
 		};
 	}
 	handleChannelDrag(moreProps) {
-		console.log('dr')
 		const { index, onDrag } = this.props;
 
 		const {
@@ -71,7 +69,6 @@ class FullLine extends Component {
 		});
 	}
 	handleLineDrag(moreProps) {
-		console.log('ld')
 		const { index, onDrag } = this.props;
 		const {
 			startXY,
@@ -120,15 +117,12 @@ class FullLine extends Component {
 			onDragComplete={onDragComplete} />;
 	}
 	render() {
-		const { startXY } = this.props;
-		const { interactive, hoverText, appearance } = this.props;
+		const { startXY, interactive, hoverText, appearance, onDragComplete, selected, type } = this.props;
 		const {
 			edgeFill,
 			stroke, strokeWidth, strokeOpacity,
 			fill, fillOpacity,
 		} = appearance;
-		const { selected } = this.props;
-		const { onDragComplete } = this.props;
 		const { hover } = this.state;
 		const { enable: hoverTextEnabled, ...restHoverTextProps } = hoverText;
 
@@ -143,17 +137,17 @@ class FullLine extends Component {
 					dragHandler: this.handleLineDrag,
 					cursor: "react-stockcharts-move-cursor",
 					fill: edgeFill,
-					edge: "edge",
+					edge: "fullLineEdge",
 				})}
 			</g>
 			: null;
 		return <g>
 			<FullLineComponent
-				ref={this.saveNodeType("channel")}
+				ref={this.saveNodeType("fullLine")}
 				selected={selected || hover}
 
 				{...hoverHandler}
-
+				type={type}
 				startXY={startXY}
 				stroke={stroke}
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
@@ -178,7 +172,6 @@ FullLine.propTypes = {
 	interactive: PropTypes.bool.isRequired,
 	selected: PropTypes.bool.isRequired,
 	hoverText: PropTypes.object.isRequired,
-
 	appearance: PropTypes.shape({
 		stroke: PropTypes.string.isRequired,
 		fillOpacity: PropTypes.number.isRequired,
@@ -191,7 +184,10 @@ FullLine.propTypes = {
 		edgeStrokeWidth: PropTypes.number.isRequired,
 		r: PropTypes.number.isRequired,
 	}).isRequired,
-
+	type: PropTypes.oneOf([
+		"VERTICAL",
+		"HORIZONTAL",
+	]).isRequired,
 	index: PropTypes.number,
 	onDrag: PropTypes.func.isRequired,
 	onDragComplete: PropTypes.func.isRequired,

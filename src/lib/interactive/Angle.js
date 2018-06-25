@@ -233,7 +233,7 @@ Angle.propTypes = {
 };
 
 Angle.defaultProps = {
-	type: "XLINE",
+	type: "ANGLE",
 
 	onStart: noop,
 	onComplete: noop,

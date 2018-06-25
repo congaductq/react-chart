@@ -29,7 +29,7 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { FullLine as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { Angle as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
 
 import {
@@ -63,16 +63,7 @@ class CandlestickChart extends React.Component {
 		this.state = {
 			enableTrendLine: true,
 			trends_1: [
-				{ startXY: [1606, 56], appearance: { stroke: "#000000",
-				strokeOpacity: 1,
-				strokeWidth: 1,
-				fill: "#8AAFE2",
-				fillOpacity: 0.7,
-				edgeStroke: "#000000",
-				edgeFill: "#FFFFFF",
-				edgeFill2: "#250B98",
-				edgeStrokeWidth: 1,
-				r: 5, }, type: "VERTICAL" }
+				{ start: [1606, 56], end: [1711, 53], appearance: { stroke: "green" }, type: "CIRCLE" }
 			],
 			trends_3: []
 		};
@@ -188,6 +179,7 @@ class CandlestickChart extends React.Component {
 		const start = xAccessor(last(data));
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
+
 		return (
 			<ChartCanvas ref={this.saveCanvasNode}
 				height={600}
@@ -246,12 +238,12 @@ class CandlestickChart extends React.Component {
 					<TrendLine
 						ref={this.saveInteractiveNodes("Trendline", 1)}
 						enabled={this.state.enableTrendLine}
-						type="VERTICAL"
+						type="CIRCLE"
 						snap={false}
 						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}
 						onComplete={this.onDrawCompleteChart1}
-						channels={this.state.trends_1}
+						trends={this.state.trends_1}
 					/>
 				</Chart>
 				<Chart id={2} height={150}

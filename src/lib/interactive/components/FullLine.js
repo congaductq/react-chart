@@ -18,16 +18,29 @@ class FullLine extends Component {
 		this.isHover = this.isHover.bind(this);
 	}
 	isHover(moreProps) {
-		const { tolerance, onHover, startXY } = this.props;
-		if (isDefined(onHover)) {
+		const { tolerance, onHover, startXY, type } = this.props;
+		const { mouseXY, xScale, chartConfig: { yScale } } = moreProps;
+		if (isDefined(onHover) && isDefined(startXY)) {
 			const [x1, y1] = startXY;
-			if (isDefined(startXY)) {
-				const { mouseXY, xScale, chartConfig: { yScale } } = moreProps;
+			if (type === "VERTICAL") {
 				const lineHover = isHovering({
 					x1Value: x1,
-					y1Value: y1 - 100,
+					y1Value: y1 - 1000,
 					x2Value: x1,
-					y2Value: y1 + 100,
+					y2Value: y1 + 1000,
+					type: "LINE",
+					mouseXY,
+					tolerance,
+					xScale,
+					yScale,
+				});
+				return lineHover;
+			} else if (type === "HORIZONTAL") {
+				const lineHover = isHovering({
+					x1Value: x1 - 1000,
+					y1Value: y1,
+					x2Value: x1 + 1000,
+					y2Value: y1,
 					type: "LINE",
 					mouseXY,
 					tolerance,
@@ -96,7 +109,6 @@ class FullLine extends Component {
 	render() {
 		const { selected, interactiveCursorClass } = this.props;
 		const { onDragStart, onDrag, onDragComplete, onHover, onUnHover } = this.props;
-
 		return <GenericChartComponent
 			isHover={this.isHover}
 
@@ -130,12 +142,20 @@ function getPath(line1, line2) {
 
 function helper(props, moreProps) {
 	const { xScale, chartConfig: { yScale } } = moreProps;
-	const { startXY } = props;
+	const { startXY, type } = props;
 	const [x1Value, y1Value] = startXY;
-	const x1 = xScale(x1Value);
-	const y1 = yScale(y1Value - 100);
-	const x2 = xScale(x1Value);
-	const y2 = yScale(y1Value + 100);
+	let x1, x2, y1, y2;
+	if (type === "VERTICAL") {
+		x1 = xScale(x1Value);
+		y1 = yScale(y1Value - 1000);
+		x2 = xScale(x1Value);
+		y2 = yScale(y1Value + 1000);
+	} else if (type === "HORIZONTAL") {
+		x1 = xScale(x1Value - 1000);
+		y1 = yScale(y1Value);
+		x2 = xScale(x1Value + 1000);
+		y2 = yScale(y1Value);
+	}
 	return { x1, y1, x2, y2 };
 }
 
@@ -169,7 +189,6 @@ FullLine.defaultProps = {
 	onDragStart: noop,
 	onDrag: noop,
 	onDragComplete: noop,
-	type: "LINE",
 
 	strokeWidth: 1,
 	tolerance: 4,

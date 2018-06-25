@@ -144,9 +144,6 @@ export function isHovering({
 
 	const m = getSlope(start, end);
 	const [mouseX, mouseY] = mouseXY;
-	console.log(mouseY)
-	console.log(start[1])
-	console.log(end[1])
 
 	if (isDefined(m)) {
 		const b = getYIntercept(m, end);
