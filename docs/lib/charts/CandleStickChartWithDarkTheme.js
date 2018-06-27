@@ -142,6 +142,9 @@ class CandlestickChart extends React.Component {
 		}
 		}
 	}
+	onMouseEvent() {
+		console.log('k')
+	}
 	render() {
 		const ema26 = ema()
 			.id(0)
