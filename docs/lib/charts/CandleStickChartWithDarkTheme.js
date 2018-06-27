@@ -29,7 +29,7 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { Angle as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
 
 import {
@@ -63,7 +63,7 @@ class CandlestickChart extends React.Component {
 		this.state = {
 			enableTrendLine: true,
 			trends_1: [
-				{ start: [1606, 56], end: [1711, 53], appearance: { stroke: "green" }, type: "CIRCLE" }
+				{ start: [1606, 56], end: [1711, 53], appearance: { stroke: "green" }, type: "SELECT" }
 			],
 			trends_3: []
 		};
@@ -238,7 +238,7 @@ class CandlestickChart extends React.Component {
 					<TrendLine
 						ref={this.saveInteractiveNodes("Trendline", 1)}
 						enabled={this.state.enableTrendLine}
-						type="CIRCLE"
+						type="SELECT"
 						snap={false}
 						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}
@@ -277,7 +277,7 @@ class CandlestickChart extends React.Component {
 					<TrendLine
 						ref={this.saveInteractiveNodes("Trendline", 3)}
 						enabled={this.state.enableTrendLine}
-						type="RAY"
+						type="SELECT"
 						snap={false}
 						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}

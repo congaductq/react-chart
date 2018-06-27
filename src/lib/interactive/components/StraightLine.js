@@ -21,48 +21,67 @@ class StraightLine extends Component {
 		this.isHover = this.isHover.bind(this);
 	}
 	isHover(moreProps) {
-		const { tolerance, onHover } = this.props;
+		const { tolerance, onHover, type } = this.props;
 
 		if (isDefined(onHover)) {
-			const { x1Value, x2Value, y1Value, y2Value, type } = this.props;
-			const { mouseXY, xScale } = moreProps;
-			const { chartConfig: { yScale } } = moreProps;
-
-			const hovering = isHovering({
-				x1Value, y1Value,
-				x2Value, y2Value,
-				mouseXY,
-				type,
-				tolerance,
-				xScale,
-				yScale,
-			});
-
-			// console.log("hovering ->", hovering);
-
-			return hovering;
+			if (type === "SELECT") {
+				const { x1Value, x2Value } = this.props;
+				const { mouseXY, xScale } = moreProps;
+				const x1 = xScale(x1Value);
+				const x2 = xScale(x2Value);
+				return (x1 <= mouseXY[0] + tolerance && x1 >= mouseXY[0] - tolerance) ||
+							(x2 <= mouseXY[0] + tolerance && x2 >= mouseXY[0] - tolerance);
+			} else {
+				const { x1Value, x2Value, y1Value, y2Value, type } = this.props;
+				const { mouseXY, xScale } = moreProps;
+				const { chartConfig: { yScale } } = moreProps;
+				const hovering = isHovering({
+					x1Value, y1Value,
+					x2Value, y2Value,
+					mouseXY,
+					type,
+					tolerance,
+					xScale,
+					yScale,
+				});
+				return hovering;
+			}
 		}
 		return false;
 	}
 	drawOnCanvas(ctx, moreProps) {
 		const { stroke, strokeWidth, strokeOpacity, strokeDasharray, type } = this.props;
-		const { x1, y1, x2, y2 } = helper(this.props, moreProps);
 
 		ctx.lineWidth = strokeWidth;
 		ctx.strokeStyle = hexToRGBA(stroke, strokeOpacity);
 		ctx.setLineDash(getStrokeDasharray(strokeDasharray).split(","));
 
-		ctx.beginPath();
-		ctx.moveTo(x1, y1);
-		ctx.lineTo(x2, y2);
-		if (type === "ARROW") {
-			const headlen = 20;
-			const angle = Math.atan2(y2 - y1, x2 - x1);
-			ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
-			ctx.moveTo(x2, y2);
-			ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+		if (type === "SELECT") {
+			const { beginLine, endLine } = helperArea(this.props, moreProps);
+			const { fill, fillOpacity } = this.props;
+			ctx.fillStyle = hexToRGBA(fill, fillOpacity);
+			ctx.beginPath();
+			ctx.moveTo(beginLine.x1, beginLine.y1);
+			ctx.lineTo(beginLine.x2, beginLine.y2);
+			ctx.lineTo(endLine.x2, endLine.y2);
+			ctx.lineTo(endLine.x1, endLine.y1);
+			ctx.lineTo(beginLine.x1, beginLine.y1);
+			ctx.stroke();
+			ctx.fill();
+		} else {
+			const { x1, y1, x2, y2 } = helper(this.props, moreProps);
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			if (type === "ARROW") {
+				const headlen = 20;
+				const angle = Math.atan2(y2 - y1, x2 - x1);
+				ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+				ctx.moveTo(x2, y2);
+				ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+			}
+			ctx.stroke();
 		}
-		ctx.stroke();
 	}
 	renderSVG(moreProps) {
 		const { stroke, strokeWidth, strokeOpacity, strokeDasharray } = this.props;
@@ -184,6 +203,39 @@ function helper(props, moreProps) {
 	};
 }
 
+function helperArea(props, moreProps) {
+	const { x1Value, x2Value, y1Value, y2Value, type } = props;
+
+	const { xScale, chartConfig: { yScale } } = moreProps;
+
+	const { startLine, endLine } = generateLine({
+		type,
+		start: [x1Value, y1Value],
+		end: [x2Value, y2Value],
+		xScale,
+		yScale,
+	});
+
+	const x1 = xScale(startLine.x1);
+	const y1 = yScale(startLine.y1);
+	const x2 = xScale(startLine.x2);
+	const y2 = yScale(startLine.y2);
+
+	const x3 = xScale(endLine.x1);
+	const y3 = yScale(endLine.y1);
+	const x4 = xScale(endLine.x2);
+	const y4 = yScale(endLine.y2);
+
+	return {
+		beginLine: {
+			x1, y1, x2, y2,
+		},
+		endLine: {
+			x1: x3, y1: y3, x2: x4, y2: y4,
+		}
+	};
+}
+
 export function getSlope(start, end) {
 	const m /* slope */ = end[0] === start[0]
 		? undefined
@@ -218,6 +270,15 @@ export function generateLine({
 			return getLineCoordinates({
 				type, start, end, xScale, yScale, m, b
 			});
+		case "SELECT":
+			return {
+				startLine: getXLineCoordinates({
+					type, start, end: [start[0], start[1] - 1], xScale, yScale, m, b
+				}),
+				endLine: getXLineCoordinates({
+					type, start: [end[0], end[1] - 1], end, xScale, yScale, m, b
+				})
+			};
 	}
 }
 
@@ -307,6 +368,7 @@ StraightLine.propTypes = {
 		"RAY", // extends to +/-Infinity in one direction
 		"LINE", // extends between the set bounds
 		"ARROW", // arrow
+		"SELECT", // select area
 	]).isRequired,
 
 	onEdge1Drag: PropTypes.func.isRequired,
@@ -327,6 +389,8 @@ StraightLine.propTypes = {
 	children: PropTypes.func.isRequired,
 	tolerance: PropTypes.number.isRequired,
 	selected: PropTypes.bool.isRequired,
+	fill: PropTypes.string.isRequired,
+	fillOpacity: PropTypes.number.isRequired,
 };
 
 StraightLine.defaultProps = {
@@ -346,6 +410,8 @@ StraightLine.defaultProps = {
 	children: noop,
 	tolerance: 7,
 	selected: false,
+	fill: "#8AAFE2",
+	fillOpacity: 0.6,
 };
 
 export default StraightLine;

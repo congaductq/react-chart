@@ -32,12 +32,13 @@ class OHLCTooltip extends Component {
 
 		const currentItem = displayValuesFor(this.props, moreProps);
 
-		let displayDate, open, high, low, close, volume, percent;
-		displayDate = open = high = low = close = volume = percent = displayTexts.na;
+		let displayDate, open, high, low, close, volume, percent, max_cap;
+		displayDate = open = high = low = close = volume = percent = max_cap = displayTexts.na;
 
 		if (isDefined(currentItem) && isDefined(accessor(currentItem))) {
 			const item = accessor(currentItem);
 			volume = isDefined(item.volume) ? volumeFormat(item.volume) : displayTexts.na;
+			max_cap = isDefined(item.max_cap) ? volumeFormat(item.max_cap) : displayTexts.na;
 
 			displayDate = xDisplayFormat(displayXAccessor(item));
 			open = ohlcFormat(item.open);
@@ -59,6 +60,7 @@ class OHLCTooltip extends Component {
 			close,
 			percent,
 			volume,
+			max_cap,
 			x,
 			y
 		};
@@ -100,6 +102,7 @@ const displayTextsDefault = {
 	l: " L: ",
 	c: " C: ",
 	v: " Vol: ",
+	m: " Cap: ",
 	na: "n/a"
 };
 
@@ -111,7 +114,8 @@ OHLCTooltip.defaultProps = {
 			high: d.high,
 			low: d.low,
 			close: d.close,
-			volume: d.volume
+			volume: d.volume,
+			max_cap: d.max_cap,
 		};
 	},
 	xDisplayFormat: timeFormat("%Y-%m-%d"),
@@ -145,6 +149,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 		low,
 		close,
 		volume,
+		max_cap,
 		x,
 		y
 	} = itemsToDisplay;
@@ -176,6 +181,8 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 				<tspan key="value_C" fill={textFill}>{close}</tspan>
 				<ToolTipTSpanLabel fill={labelFill} key="label_Vol">{displayTexts.v}</ToolTipTSpanLabel>
 				<tspan key="value_Vol" fill={textFill}>{volume}</tspan>
+				<ToolTipTSpanLabel fill={labelFill} key="label_Cap">{displayTexts.m}</ToolTipTSpanLabel>
+				<tspan key="value_Cap" fill={textFill}>{max_cap}</tspan>
 			</ToolTipText>
 		</g>
 	);

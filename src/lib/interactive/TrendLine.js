@@ -141,6 +141,8 @@ class TrendLine extends Component {
 				y2Value={current.end[1]}
 				stroke={appearance.stroke}
 				strokeWidth={appearance.strokeWidth}
+				fill={appearance.fill}
+				fillOpacity={appearance.fillOpacity}
 				strokeOpacity={appearance.strokeOpacity} />
 			: null;
 
@@ -166,6 +168,8 @@ class TrendLine extends Component {
 					edgeStroke={eachAppearance.edgeStroke}
 					edgeFill={eachAppearance.edgeFill}
 					edgeStrokeWidth={eachAppearance.edgeStrokeWidth}
+					fill={appearance.fill}
+					fillOpacity={appearance.fillOpacity}
 					r={eachAppearance.r}
 					hoverText={hoverText}
 					onDrag={this.handleDragLine}
@@ -212,6 +216,7 @@ TrendLine.propTypes = {
 		"RAY", // extends to +/-Infinity in one direction
 		"LINE", // extends between the set bounds
 		"ARROW", // arrow
+		"SELECT", // select area
 	]),
 	hoverText: PropTypes.object.isRequired,
 
@@ -225,6 +230,8 @@ TrendLine.propTypes = {
 		edgeStrokeWidth: PropTypes.number.isRequired,
 		edgeFill: PropTypes.string.isRequired,
 		edgeStroke: PropTypes.string.isRequired,
+		fill: PropTypes.string.isRequired,
+		fillOpacity: PropTypes.number.isRequired,
 	}).isRequired
 };
 
@@ -259,6 +266,8 @@ TrendLine.defaultProps = {
 		edgeFill: "#FFFFFF",
 		edgeStroke: "#000000",
 		r: 6,
+		fill: "#8AAFE2",
+		fillOpacity: 0.6,
 	}
 };
 

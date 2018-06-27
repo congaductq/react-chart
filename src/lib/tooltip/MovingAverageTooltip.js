@@ -25,11 +25,9 @@ class SingleMAToolTip extends Component {
 		const translate = "translate(" + this.props.origin[0] + ", " + this.props.origin[1] + ")";
 		return (
 			<g transform={translate}>
-				<line x1={0} y1={2} x2={0} y2={28} stroke={this.props.color} strokeWidth="4px"/>
 				<ToolTipText x={5} y={11}
 					fontFamily={this.props.fontFamily} fontSize={this.props.fontSize}>
-					<ToolTipTSpanLabel fill={labelFill}>{this.props.displayName}</ToolTipTSpanLabel>
-					<tspan x="5" dy="15" fill={textFill}>{this.props.value}</tspan>
+					<tspan x="5" dy="15" fill={textFill}><ToolTipTSpanLabel fill={labelFill}>{this.props.displayName}: </ToolTipTSpanLabel>{this.props.value}</tspan>
 				</ToolTipText>
 				<rect x={0} y={0} width={55} height={30}
 					onClick={this.handleClick}

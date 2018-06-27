@@ -38,25 +38,25 @@ class FullLine extends Component {
 	}
 	handleDragStart() {
 		const {
-			startXY
+			x, y,
 		} = this.props;
 
 		this.dragStart = {
-			startXY
+			x, y,
 		};
 	}
 	handleChannelDrag(moreProps) {
 		const { index, onDrag } = this.props;
 
 		const {
-			startXY
+			x, y
 		} = this.dragStart;
 
 		const { xScale, chartConfig: { yScale }, xAccessor, fullData } = moreProps;
 		const { startPos, mouseXY } = moreProps;
 
-		const x1 = xScale(startXY[0]);
-		const y1 = yScale(startXY[1]);
+		const x1 = xScale(x);
+		const y1 = yScale(y);
 
 		const dx = startPos[0] - mouseXY[0];
 		const dy = startPos[1] - mouseXY[1];
@@ -65,13 +65,14 @@ class FullLine extends Component {
 		const newY1Value = yScale.invert(y1 - dy);
 
 		onDrag(index, {
-			startXY: [newX1Value, newY1Value],
+			x: newX1Value,
+			y: newY1Value,
 		});
 	}
 	handleLineDrag(moreProps) {
 		const { index, onDrag } = this.props;
 		const {
-			startXY,
+			x, y,
 		} = this.dragStart;
 
 		const {
@@ -83,14 +84,15 @@ class FullLine extends Component {
 		const dx = startPos[0] - mouseXY[0];
 		const dy = startPos[1] - mouseXY[1];
 
-		const x1 = xScale(startXY[0]);
-		const y1 = yScale(startXY[1]);
+		const x1 = xScale(x);
+		const y1 = yScale(y);
 
 		const newX1Value = getXValue(xScale, xAccessor, [x1 - dx, y1 - dy], fullData);
 		const newY1Value = yScale.invert(y1 - dy);
 
 		onDrag(index, {
-			startXY: [newX1Value, newY1Value],
+			x: newX1Value,
+			y: newY1Value,
 		});
 	}
 	getEdgeCircle({ xy, dragHandler, cursor, fill, edge }) {
@@ -117,7 +119,7 @@ class FullLine extends Component {
 			onDragComplete={onDragComplete} />;
 	}
 	render() {
-		const { startXY, interactive, hoverText, appearance, onDragComplete, selected, type } = this.props;
+		const { x, y, interactive, hoverText, appearance, onDragComplete, selected, type } = this.props;
 		const {
 			edgeFill,
 			stroke, strokeWidth, strokeOpacity,
@@ -130,10 +132,10 @@ class FullLine extends Component {
 			? { onHover: this.handleHover, onUnHover: this.handleHover }
 			: {};
 
-		const line1Edge = isDefined(startXY)
+		const line1Edge = isDefined(x) && isDefined(y)
 			? <g>
 				{this.getEdgeCircle({
-					xy: startXY,
+					xy: [x, y],
 					dragHandler: this.handleLineDrag,
 					cursor: "react-stockcharts-move-cursor",
 					fill: edgeFill,
@@ -143,12 +145,12 @@ class FullLine extends Component {
 			: null;
 		return <g>
 			<FullLineComponent
-				ref={this.saveNodeType("fullLine")}
+				ref={this.saveNodeType("line")}
 				selected={selected || hover}
 
 				{...hoverHandler}
 				type={type}
-				startXY={startXY}
+				startXY={[x, y]}
 				stroke={stroke}
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
@@ -168,7 +170,8 @@ class FullLine extends Component {
 }
 
 FullLine.propTypes = {
-	startXY: PropTypes.arrayOf(PropTypes.number).isRequired,
+	x: PropTypes.number.isRequired,
+	y: PropTypes.number.isRequired,
 	interactive: PropTypes.bool.isRequired,
 	selected: PropTypes.bool.isRequired,
 	hoverText: PropTypes.object.isRequired,

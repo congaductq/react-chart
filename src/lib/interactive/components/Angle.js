@@ -301,7 +301,7 @@ export function generateLine({
 
 	return getLineCoordinates({
 		type, start, end, xScale, yScale, m, b
-	})
+	});
 }
 
 function getLineCoordinates({

@@ -25,9 +25,9 @@ class FullLine extends Component {
 			if (type === "VERTICAL") {
 				const lineHover = isHovering({
 					x1Value: x1,
-					y1Value: y1 - 1000,
+					y1Value: y1 - 10000,
 					x2Value: x1,
-					y2Value: y1 + 1000,
+					y2Value: y1 + 10000,
 					type: "LINE",
 					mouseXY,
 					tolerance,
@@ -37,9 +37,9 @@ class FullLine extends Component {
 				return lineHover;
 			} else if (type === "HORIZONTAL") {
 				const lineHover = isHovering({
-					x1Value: x1 - 1000,
+					x1Value: x1 - 5000,
 					y1Value: y1,
-					x2Value: x1 + 1000,
+					x2Value: x1 + 5000,
 					y2Value: y1,
 					type: "LINE",
 					mouseXY,
@@ -147,13 +147,13 @@ function helper(props, moreProps) {
 	let x1, x2, y1, y2;
 	if (type === "VERTICAL") {
 		x1 = xScale(x1Value);
-		y1 = yScale(y1Value - 1000);
+		y1 = yScale(y1Value - 10000);
 		x2 = xScale(x1Value);
-		y2 = yScale(y1Value + 1000);
+		y2 = yScale(y1Value + 10000);
 	} else if (type === "HORIZONTAL") {
-		x1 = xScale(x1Value - 1000);
+		x1 = xScale(x1Value - 5000);
 		y1 = yScale(y1Value);
-		x2 = xScale(x1Value + 1000);
+		x2 = xScale(x1Value + 5000);
 		y2 = yScale(y1Value);
 	}
 	return { x1, y1, x2, y2 };

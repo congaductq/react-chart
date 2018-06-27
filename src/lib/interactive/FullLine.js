@@ -8,18 +8,16 @@ import {
 	terminate,
 	saveNodeType,
 	isHoverForInteractiveType,
+	getValueFromOverride,
 } from "./utils";
 import EachFullLine from "./wrapper/EachFullLine";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
-import GenericChartComponent from "../GenericChartComponent";
-import { getMouseCanvas } from "../GenericComponent";
 
 class FullLine extends Component {
 	constructor(props) {
 		super(props);
 
-		this.handleStart = this.handleStart.bind(this);
 		this.handleEnd = this.handleEnd.bind(this);
 		this.handleDrawChannel = this.handleDrawChannel.bind(this);
 		this.handleDragChannel = this.handleDragChannel.bind(this);
@@ -45,13 +43,21 @@ class FullLine extends Component {
 	}
 	handleDragChannelComplete(moreProps) {
 		const { override } = this.state;
-		const { trends } = this.props;
 		if (isDefined(override)) {
-			const { index, ...rest } = override;
+			const { trends } = this.props;
 			const newTrends = trends
-				.map((each, idx) => idx === index
-					? { ...each, ...rest, selected: true }
-					: each);
+				.map((each, idx) => idx === override.index
+					? {
+						...each,
+						x: override.x,
+						y: override.y,
+						selected: true,
+					}
+					: {
+						...each,
+						selected: false,
+					});
+
 			this.setState({
 				override: null,
 			}, () => {
@@ -63,18 +69,9 @@ class FullLine extends Component {
 		this.mouseMoved = true;
 		this.setState({
 			current: {
-				startXY: xyValue,
+				x: xyValue[0],
+				y: xyValue[1],
 			}
-		});
-	}
-	handleStart(xyValue, moreProps, e) {
-		this.mouseMoved = false;
-		this.setState({
-			current: {
-				startXY: xyValue,
-			}
-		}, () => {
-			this.props.onStart(moreProps, e);
 		});
 	}
 	handleEnd(xyValue, moreProps, e) {
@@ -83,7 +80,8 @@ class FullLine extends Component {
 			...trends.map(d => ({ ...d, selected: false })),
 			{
 				selected: true,
-				startXY: xyValue,
+				x: xyValue[0],
+				y: xyValue[1],
 				appearance,
 				type,
 			}
@@ -97,11 +95,11 @@ class FullLine extends Component {
 	}
 	render() {
 		const { appearance, enabled, currentPositionRadius, currentPositionStroke,
-			currentPositionOpacity, currentPositionStrokeWidth, trends, hoverText, type
+			currentPositionOpacity, currentPositionStrokeWidth, trends, hoverText, type,
+			snap, shouldDisableSnap, snapTo,
 		} = this.props;
 		const { current, override } = this.state;
-		const overrideIndex = isDefined(override) ? override.index : null;
-		const tempChannel = isDefined(current)
+		const tempChannel = isDefined(current) && isDefined(current.x) && isDefined(current.y)
 			? <EachFullLine
 				type={type}
 				interactive={false}
@@ -120,7 +118,8 @@ class FullLine extends Component {
 					index={idx}
 					selected={each.selected}
 					hoverText={hoverText}
-					{...(idx === overrideIndex ? override : each)}
+					x={getValueFromOverride(override, idx, "x", each.x)}
+					y={getValueFromOverride(override, idx, "y", each.y)}
 					appearance={eachAppearance}
 					onDrag={this.handleDragChannel}
 					onDragComplete={this.handleDragChannelComplete}
@@ -129,7 +128,9 @@ class FullLine extends Component {
 			{tempChannel}
 			<MouseLocationIndicator
 				enabled={enabled}
-				snap={false}
+				snap={snap}
+				shouldDisableSnap={shouldDisableSnap}
+				snapTo={snapTo}
 				r={currentPositionRadius}
 				stroke={currentPositionStroke}
 				opacity={currentPositionOpacity}
@@ -147,7 +148,10 @@ FullLine.propTypes = {
 		"VERTICAL",
 		"HORIZONTAL",
 	]).isRequired,
+	snap: PropTypes.bool.isRequired,
 	enabled: PropTypes.bool.isRequired,
+	snapTo: PropTypes.func,
+	shouldDisableSnap: PropTypes.func.isRequired,
 
 	onStart: PropTypes.func.isRequired,
 	onComplete: PropTypes.func.isRequired,
@@ -180,6 +184,7 @@ FullLine.defaultProps = {
 	onStart: noop,
 	onComplete: noop,
 	onSelect: noop,
+	shouldDisableSnap: e => (e.button === 2 || e.shiftKey),
 
 	currentPositionStroke: "#000000",
 	currentPositionOpacity: 1,

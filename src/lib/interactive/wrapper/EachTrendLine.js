@@ -143,6 +143,8 @@ class EachTrendLine extends Component {
 			r,
 			edgeStrokeWidth,
 			edgeFill,
+			fill,
+			fillOpacity,
 			edgeStroke,
 			edgeInteractiveCursor,
 			lineInteractiveCursor,
@@ -167,6 +169,8 @@ class EachTrendLine extends Component {
 				y2Value={y2Value}
 				type={type}
 				stroke={stroke}
+				fill={fill}
+				fillOpacity={fillOpacity}
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
 				strokeDasharray={strokeDasharray}
@@ -234,6 +238,7 @@ EachTrendLine.propTypes = {
 		"RAY", // extends to +/-Infinity in one direction
 		"LINE", // extends between the set bounds
 		"ARROW", // arrow
+		"SELECT", // select area
 	]).isRequired,
 
 	onDrag: PropTypes.func.isRequired,
@@ -259,6 +264,8 @@ EachTrendLine.propTypes = {
 	lineInteractiveCursor: PropTypes.string.isRequired,
 	edgeFill: PropTypes.string.isRequired,
 	hoverText: PropTypes.object.isRequired,
+	fill: PropTypes.string.isRequired,
+	fillOpacity: PropTypes.number.isRequired,
 };
 
 EachTrendLine.defaultProps = {
@@ -273,6 +280,8 @@ EachTrendLine.defaultProps = {
 
 	edgeStroke: "#000000",
 	edgeFill: "#FFFFFF",
+	fill: "#8AAFE2",
+	fillOpacity: 0.6,
 	edgeStrokeWidth: 2,
 	r: 5,
 	strokeWidth: 1,
