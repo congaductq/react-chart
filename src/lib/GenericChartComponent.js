@@ -31,7 +31,6 @@ class GenericChartComponent extends GenericComponent {
 
 		const { chartConfig: { width, height } } = moreProps;
 		const { clip, edgeClip } = this.props;
-
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.scale(ratio, ratio);
 		if (edgeClip) {

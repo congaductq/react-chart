@@ -11,8 +11,9 @@ import {
 	getValueFromOverride,
 } from "./utils";
 import EachFullLine from "./wrapper/EachFullLine";
-import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
+import GenericChartComponent from "../GenericChartComponent";
+import { getMouseCanvas } from "../GenericComponent";
 
 class FullLine extends Component {
 	constructor(props) {
@@ -65,38 +66,55 @@ class FullLine extends Component {
 			});
 		}
 	}
-	handleDrawChannel(xyValue) {
-		this.mouseMoved = true;
-		this.setState({
-			current: {
-				x: xyValue[0],
-				y: xyValue[1],
-			}
-		});
+	handleDrawChannel(moreProps) {
+		const { current } = this.state;
+		if (isDefined(current)) {
+			const {
+				mouseXY: [, mouseY],
+				chartConfig: { yScale },
+				xAccessor,
+				currentItem,
+			} = moreProps;
+			const xyValue = [xAccessor(currentItem), yScale.invert(mouseY)];
+			this.setState({
+				current: {
+					x: xyValue[0],
+					y: xyValue[1],
+				}
+			});
+		}
 	}
-	handleEnd(xyValue, moreProps, e) {
-		const { trends, appearance, type } = this.props;
-		const newTrends = [
-			...trends.map(d => ({ ...d, selected: false })),
-			{
-				selected: true,
-				x: xyValue[0],
-				y: xyValue[1],
-				appearance,
-				type,
-			}
-		];
-		this.setState({
-			current: null,
-			trends: newTrends
-		}, () => {
-			this.props.onComplete(newTrends, moreProps, e);
-		});
+	handleEnd(moreProps, e) {
+		const { current } = this.state;
+		if (isDefined(current)) {
+			const { trends, appearance, type } = this.props;
+			const {
+				mouseXY: [, mouseY],
+				chartConfig: { yScale },
+				xAccessor,
+				currentItem,
+			} = moreProps;
+			const xyValue = [xAccessor(currentItem), yScale.invert(mouseY)];
+			const newTrends = [
+				...trends.map(d => ({ ...d, selected: false })),
+				{
+					selected: true,
+					x: xyValue[0],
+					y: xyValue[1],
+					appearance,
+					type,
+				}
+			];
+			this.setState({
+				current: null,
+				trends: newTrends
+			}, () => {
+				this.props.onComplete(newTrends, moreProps, e);
+			});
+		}
 	}
 	render() {
-		const { appearance, enabled, currentPositionRadius, currentPositionStroke,
-			currentPositionOpacity, currentPositionStrokeWidth, trends, hoverText, type,
-			snap, shouldDisableSnap, snapTo,
+		const { appearance, trends, hoverText, type,
 		} = this.props;
 		const { current, override } = this.state;
 		const tempChannel = isDefined(current) && isDefined(current.x) && isDefined(current.y)
@@ -126,18 +144,14 @@ class FullLine extends Component {
 				/>;
 			})}
 			{tempChannel}
-			<MouseLocationIndicator
-				enabled={enabled}
-				snap={snap}
-				shouldDisableSnap={shouldDisableSnap}
-				snapTo={snapTo}
-				r={currentPositionRadius}
-				stroke={currentPositionStroke}
-				opacity={currentPositionOpacity}
-				strokeWidth={currentPositionStrokeWidth}
+			<GenericChartComponent
 				onClick={this.handleEnd}
 				onMouseMove={this.handleDrawChannel}
-			/>
+				svgDraw={noop}
+				canvasDraw={noop}
+				canvasToDraw={getMouseCanvas}
+				drawOn={["mousemove", "pan"]}
+			/>;
 		</g>;
 	}
 }
