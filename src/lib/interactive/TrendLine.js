@@ -1,5 +1,4 @@
 
-
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
@@ -253,19 +252,19 @@ TrendLine.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 120,
-		text: "Click to select",
+		text: "Click to select object",
 	},
 	trends: [],
 
 	appearance: {
 		stroke: "#000000",
-		strokeOpacity: 0.7,
-		strokeWidth: 1,
+		strokeOpacity: 1,
+		strokeWidth: 0.7,
 		strokeDasharray: "Solid",
 		edgeStrokeWidth: 1,
 		edgeFill: "#FFFFFF",
 		edgeStroke: "#000000",
-		r: 5,
+		r: 6,
 		fill: "#8AAFE2",
 		fillOpacity: 0.5,
 	}
