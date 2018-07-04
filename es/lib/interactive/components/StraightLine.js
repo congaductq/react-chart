@@ -489,9 +489,6 @@ StraightLine.propTypes = {
 	defaultClassName: PropTypes.string,
 
 	r: PropTypes.number.isRequired,
-	edgeFill: PropTypes.string.isRequired,
-	edgeStroke: PropTypes.string.isRequired,
-	edgeStrokeWidth: PropTypes.number.isRequired,
 	withEdge: PropTypes.bool.isRequired,
 	children: PropTypes.func.isRequired,
 	tolerance: PropTypes.number.isRequired,
@@ -518,7 +515,7 @@ StraightLine.defaultProps = {
 	tolerance: 7,
 	selected: false,
 	fill: "#8AAFE2",
-	fillOpacity: 0.6
+	fillOpacity: 0.5
 };
 
 export default StraightLine;

@@ -203,7 +203,7 @@ var FullLine = function (_Component) {
 				"g",
 				null,
 				React.createElement(FullLineComponent, _extends({
-					ref: this.saveNodeType("line"),
+					ref: this.saveNodeType("fullLine"),
 					selected: selected || hover
 
 				}, hoverHandler, {

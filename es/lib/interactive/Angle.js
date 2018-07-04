@@ -183,6 +183,12 @@ var Angle = function (_Component) {
 				stroke: appearance.stroke,
 				strokeWidth: appearance.strokeWidth,
 				strokeOpacity: appearance.strokeOpacity,
+				strokeDasharray: appearance.strokeDasharray,
+				edgeStroke: appearance.edgeStroke,
+				edgeFill: appearance.edgeFill,
+				fontFill: appearance.fontFill,
+				edgeStrokeWidth: appearance.edgeStrokeWidth,
+				r: appearance.r,
 				fill: appearance.fill,
 				fillOpacity: appearance.fillOpacity
 			}) : null;
@@ -208,6 +214,7 @@ var Angle = function (_Component) {
 						strokeDasharray: eachAppearance.strokeDasharray,
 						edgeStroke: eachAppearance.edgeStroke,
 						edgeFill: eachAppearance.edgeFill,
+						fontFill: eachAppearance.fontFill,
 						edgeStrokeWidth: eachAppearance.edgeStrokeWidth,
 						r: eachAppearance.r,
 						fill: eachAppearance.fill,
@@ -266,6 +273,7 @@ Angle.propTypes = {
 		strokeDasharray: PropTypes.oneOf(strokeDashTypes),
 		edgeStrokeWidth: PropTypes.number.isRequired,
 		edgeFill: PropTypes.string.isRequired,
+		fontFill: PropTypes.string.isRequired,
 		edgeStroke: PropTypes.string.isRequired,
 		fill: PropTypes.string.isRequired,
 		fillOpacity: PropTypes.number.isRequired
@@ -291,21 +299,22 @@ Angle.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 120,
-		text: "Click to select object"
+		text: "Click to select"
 	}),
 	trends: [],
 
 	appearance: {
-		stroke: "#000000",
-		strokeOpacity: 1,
+		stroke: "#000000 ",
+		strokeOpacity: 0.8,
 		strokeWidth: 1,
 		strokeDasharray: "Solid",
 		edgeStrokeWidth: 1,
 		edgeFill: "#FFFFFF",
+		fontFill: "#000000",
 		edgeStroke: "#000000",
 		r: 6,
 		fill: "#8AAFE2",
-		fillOpacity: 0.6
+		fillOpacity: 0.4
 	}
 };
 

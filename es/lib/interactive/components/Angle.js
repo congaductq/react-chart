@@ -140,7 +140,8 @@ var Angle = function (_Component) {
 			    strokeOpacity = _props5.strokeOpacity,
 			    type = _props5.type,
 			    fill = _props5.fill,
-			    fillOpacity = _props5.fillOpacity;
+			    fillOpacity = _props5.fillOpacity,
+			    fontFill = _props5.fontFill;
 
 			if (type === "ANGLE") {
 				var _helper = helper(this.props, moreProps),
@@ -169,6 +170,7 @@ var Angle = function (_Component) {
 				ctx.stroke();
 				if (x3 && y3) {
 					ctx.font = "15px Arial";
+					ctx.fillStyle = fontFill;
 					ctx.fillText(Math.round(-Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180) + "°", x3 + 5, y3 + 10);
 				}
 			} else if (type === "RECTANGLE") {
@@ -443,6 +445,7 @@ Angle.propTypes = {
 
 	r: PropTypes.number.isRequired,
 	edgeFill: PropTypes.string.isRequired,
+	fontFill: PropTypes.string.isRequired,
 	edgeStroke: PropTypes.string.isRequired,
 	edgeStrokeWidth: PropTypes.number.isRequired,
 	withEdge: PropTypes.bool.isRequired,
@@ -459,19 +462,10 @@ Angle.defaultProps = {
 	onDragStart: noop,
 	onDrag: noop,
 	onDragComplete: noop,
-
-	edgeStrokeWidth: 3,
-	edgeStroke: "#000000",
-	edgeFill: "#FFFFFF",
-	r: 10,
 	withEdge: false,
-	strokeWidth: 1,
-	strokeDasharray: "Solid",
 	children: noop,
 	tolerance: 7,
-	selected: false,
-	fill: "#8AAFE2",
-	fillOpacity: 0.6
+	selected: false
 };
 
 export default Angle;
