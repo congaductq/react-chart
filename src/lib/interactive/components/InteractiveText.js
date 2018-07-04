@@ -101,7 +101,6 @@ class InteractiveText extends Component {
 			ctx.lineTo(rect.x - radius, rect.y - arrowHeight - radius);
 			ctx.quadraticCurveTo(rect.x - radius, rect.y - arrowHeight, rect.x, rect.y - arrowHeight);
 			ctx.fill();
-			ctx.stroke();
 			ctx.fillStyle = textFill;
 			ctx.textBaseline = "middle";
 			ctx.textAlign = "center";

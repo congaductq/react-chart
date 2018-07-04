@@ -144,7 +144,8 @@ class EachAngle extends Component {
 			fill,
 			fillOpacity,
 			edgeStrokeWidth,
-			edgeFill,
+      edgeFill,
+      text,
 			edgeStroke,
 			edgeInteractiveCursor,
 			lineInteractiveCursor,
@@ -170,10 +171,15 @@ class EachAngle extends Component {
 				y2Value={y2Value}
 				type={type}
 				stroke={stroke}
+				edgeStroke={edgeStroke}
+				edgeStrokeWidth={edgeStrokeWidth}
+				edgeFill={edgeFill}
+				r={r}
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
 				strokeDasharray={strokeDasharray}
-				fill={fill}
+        fill={fill}
+        text={text}
 				fillOpacity={fillOpacity}
 				interactiveCursorClass={lineInteractiveCursor}
 				onDragStart={this.handleLineDragStart}
@@ -263,6 +269,7 @@ EachAngle.propTypes = {
 	edgeInteractiveCursor: PropTypes.string.isRequired,
 	lineInteractiveCursor: PropTypes.string.isRequired,
 	edgeFill: PropTypes.string.isRequired,
+	text: PropTypes.string.isRequired,
 	hoverText: PropTypes.object.isRequired,
 	fill: PropTypes.string.isRequired,
 	fillOpacity: PropTypes.number.isRequired,
@@ -275,18 +282,7 @@ EachAngle.defaultProps = {
 	onDragComplete: noop,
 	onSelect: noop,
 	onUnSelect: noop,
-
 	selected: false,
-
-	edgeStroke: "#000000",
-	edgeFill: "#FFFFFF",
-	edgeStrokeWidth: 2,
-	r: 5,
-	fill: "#8AAFE2",
-	fillOpacity: 0.6,
-	strokeWidth: 1,
-	strokeOpacity: 1,
-	strokeDasharray: "Solid",
 	hoverText: {
 		enable: false,
 	}

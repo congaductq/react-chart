@@ -145,7 +145,7 @@ class FullLine extends Component {
 			: null;
 		return <g>
 			<FullLineComponent
-				ref={this.saveNodeType("line")}
+				ref={this.saveNodeType("fullLine")}
 				selected={selected || hover}
 
 				{...hoverHandler}

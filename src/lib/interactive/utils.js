@@ -29,6 +29,7 @@ export function saveNodeType(type) {
 	};
 }
 export function isHoverForInteractiveType(interactiveType) {
+  console.log(interactiveType)
 	return function(moreProps) { // this has to be function as it is bound to this
 
 		if (isDefined(this.nodes)) {

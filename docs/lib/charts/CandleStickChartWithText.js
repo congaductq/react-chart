@@ -306,7 +306,8 @@ class CandleStickChartWithText extends React.Component {
 						<InteractiveText
 							ref={this.saveInteractiveNodes("InteractiveText", 1)}
 							enabled={this.state.enableInteractiveObject}
-							text="Lorem ipsum..."
+              text="Lorem ipsum..."
+              type="BUBBLE"
 							onDragComplete={this.onDrawComplete}
 							textList={this.state.textList_1}
 						/>

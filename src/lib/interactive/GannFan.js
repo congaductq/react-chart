@@ -192,7 +192,7 @@ GannFan.defaultProps = {
 	appearance: {
 		stroke: "#000000",
 		fillOpacity: 0.2,
-		strokeOpacity: 1,
+		strokeOpacity: 0.5,
 		strokeWidth: 1,
 		edgeStroke: "#000000",
 		edgeFill: "#FFFFFF",
@@ -227,7 +227,7 @@ GannFan.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 120,
-		text: "Click to select object",
+		text: "Click to select",
 	},
 	fans: [],
 };

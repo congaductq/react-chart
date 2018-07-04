@@ -253,21 +253,21 @@ TrendLine.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 120,
-		text: "Click to select object",
+		text: "Click to select",
 	},
 	trends: [],
 
 	appearance: {
 		stroke: "#000000",
-		strokeOpacity: 1,
+		strokeOpacity: 0.7,
 		strokeWidth: 1,
 		strokeDasharray: "Solid",
 		edgeStrokeWidth: 1,
 		edgeFill: "#FFFFFF",
 		edgeStroke: "#000000",
-		r: 6,
+		r: 5,
 		fill: "#8AAFE2",
-		fillOpacity: 0.6,
+		fillOpacity: 0.5,
 	}
 };
 

@@ -29,7 +29,7 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { FullLine as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
 
 import {
@@ -63,6 +63,7 @@ class CandlestickChart extends React.Component {
 		this.state = {
 			enableTrendLine: true,
 			trends_1: [
+				{ start: [1606, 56], end: [1711, 53], appearance: { stroke: "green" }, type: "XLINE" }
 			],
 			trends_3: []
 		};
@@ -140,9 +141,6 @@ class CandlestickChart extends React.Component {
 			break;
 		}
 		}
-	}
-	onMouseEvent() {
-		console.log('k')
 	}
 	render() {
 		const ema26 = ema()
@@ -238,9 +236,9 @@ class CandlestickChart extends React.Component {
 						]}
 					/>
 					<TrendLine
-						ref={this.saveInteractiveNodes("123", 1)}
+						ref={this.saveInteractiveNodes("Trendline", 1)}
 						enabled={this.state.enableTrendLine}
-						type="VERTICAL"
+						type="SELECT"
 						snap={false}
 						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}
@@ -277,9 +275,9 @@ class CandlestickChart extends React.Component {
 						orient="right"
 						displayFormat={format(".2f")} />
 					<TrendLine
-						ref={this.saveInteractiveNodes("x", 3)}
+						ref={this.saveInteractiveNodes("Trendline", 3)}
 						enabled={this.state.enableTrendLine}
-						type="VERTICAL"
+						type="SELECT"
 						snap={false}
 						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}
@@ -296,14 +294,14 @@ class CandlestickChart extends React.Component {
 					/>
 				</Chart>
 				<CrossHairCursor />
-				{/* <DrawingObjectSelector
+				<DrawingObjectSelector
 					enabled={!this.state.enableTrendLine}
 					getInteractiveNodes={this.getInteractiveNodes}
 					drawingObjectMap={{
 						Trendline: "trends"
 					}}
 					onSelect={this.handleSelection}
-				/> */}
+				/>
 			</ChartCanvas>
 		);
 	}

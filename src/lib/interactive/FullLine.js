@@ -210,7 +210,7 @@ FullLine.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 120,
-		text: "Click to select object",
+		text: "Click to select",
 	},
 	trends: [],
 	appearance: {
@@ -218,7 +218,7 @@ FullLine.defaultProps = {
 		strokeOpacity: 1,
 		strokeWidth: 1,
 		fill: "#8AAFE2",
-		fillOpacity: 0.7,
+		fillOpacity: 0.6,
 		edgeStroke: "#000000",
 		edgeFill: "#FFFFFF",
 		edgeFill2: "#250B98",

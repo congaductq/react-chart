@@ -314,7 +314,7 @@ EachGannFan.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 120,
-		text: "Click to select object",
+		text: "Click to select",
 	}
 };
 

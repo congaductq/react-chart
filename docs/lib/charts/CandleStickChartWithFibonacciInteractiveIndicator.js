@@ -8,7 +8,6 @@ import { timeFormat } from "d3-time-format";
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
 	BarSeries,
-	AreaSeries,
 	CandlestickSeries,
 	LineSeries,
 	MACDSeries,
@@ -28,10 +27,11 @@ import {
 	MovingAverageTooltip,
 	MACDTooltip,
 } from "react-stockcharts/lib/tooltip";
-import { ema, macd, sma } from "react-stockcharts/lib/indicator";
-import { FibonacciRetracement, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
+import { FullLine as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
+
 import {
 	saveInteractiveNodes,
 	getInteractiveNodes,
@@ -47,22 +47,24 @@ const macdAppearance = {
 	},
 };
 
-class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component {
+class CandlestickChart extends React.Component {
 	constructor(props) {
 		super(props);
 		this.onKeyPress = this.onKeyPress.bind(this);
-		this.onFibComplete1 = this.onFibComplete1.bind(this);
-		this.onFibComplete3 = this.onFibComplete3.bind(this);
+		this.onDrawCompleteChart1 = this.onDrawCompleteChart1.bind(this);
+		this.onDrawCompleteChart3 = this.onDrawCompleteChart3.bind(this);
 		this.handleSelection = this.handleSelection.bind(this);
 
 		this.saveInteractiveNodes = saveInteractiveNodes.bind(this);
 		this.getInteractiveNodes = getInteractiveNodes.bind(this);
 
 		this.saveCanvasNode = this.saveCanvasNode.bind(this);
+
 		this.state = {
-			enableFib: true,
-			retracements_1: [],
-			retracements_3: [],
+			enableTrendLine: true,
+			trends_1: [
+			],
+			trends_3: []
 		};
 	}
 	saveCanvasNode(node) {
@@ -77,60 +79,72 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 	handleSelection(interactives) {
 		const state = toObject(interactives, each => {
 			return [
-				`retracements_${each.chartId}`,
+				`trends_${each.chartId}`,
 				each.objects,
 			];
 		});
 		this.setState(state);
 	}
-	onFibComplete1(retracements_1) {
+	onDrawCompleteChart1(trends_1) {
+		// this gets called on
+		// 1. draw complete of trendline
+		// 2. drag complete of trendline
+		console.log(trends_1);
 		this.setState({
-			retracements_1,
-			enableFib: false
+			enableTrendLine: false,
+			trends_1
 		});
 	}
-	onFibComplete3(retracements_3) {
+	onDrawCompleteChart3(trends_3) {
+		// this gets called on
+		// 1. draw complete of trendline
+		// 2. drag complete of trendline
+		console.log(trends_3);
 		this.setState({
-			retracements_3,
-			enableFib: false
+			enableTrendLine: false,
+			trends_3
 		});
 	}
 	onKeyPress(e) {
 		const keyCode = e.which;
+		console.log(keyCode);
 		switch (keyCode) {
 		case 46: { // DEL
-			const retracements_1 = this.state.retracements_1
+
+			const trends_1 = this.state.trends_1
 				.filter(each => !each.selected);
-			const retracements_3 = this.state.retracements_3
+			const trends_3 = this.state.trends_3
 				.filter(each => !each.selected);
 
 			this.canvasNode.cancelDrag();
 			this.setState({
-				retracements_1,
-				retracements_3,
+				trends_1,
+				trends_3,
 			});
 			break;
 		}
 		case 27: { // ESC
-			this.canvasNode.cancelDrag();
 			this.node_1.terminate();
 			this.node_3.terminate();
+			this.canvasNode.cancelDrag();
 			this.setState({
-				enableFib: false
+				enableTrendLine: false
 			});
 			break;
 		}
-		case 68:   // D - Draw Fib
-		case 69: { // E - Enable Fib
+		case 68:   // D - Draw trendline
+		case 69: { // E - Enable trendline
 			this.setState({
-				enableFib: true
+				enableTrendLine: true
 			});
 			break;
 		}
 		}
 	}
+	onMouseEvent() {
+		console.log('k')
+	}
 	render() {
-		const { type, data: initialData, width, ratio } = this.props;
 		const ema26 = ema()
 			.id(0)
 			.options({ windowSize: 26 })
@@ -152,17 +166,9 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 			.merge((d, c) => {d.macd = c;})
 			.accessor(d => d.macd);
 
-		const smaVolume50 = sma()
-			.id(3)
-			.options({
-				windowSize: 50,
-				sourcePath: "volume",
-			})
-			.merge((d, c) => {d.smaVolume50 = c;})
-			.accessor(d => d.smaVolume50);
+		const { type, data: initialData, width, ratio } = this.props;
 
-
-		const calculatedData = macdCalculator(smaVolume50(ema12(ema26(initialData))));
+		const calculatedData = macdCalculator(ema12(ema26(initialData)));
 		const xScaleProvider = discontinuousTimeScaleProvider
 			.inputDateAccessor(d => d.date);
 		const {
@@ -190,7 +196,6 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 				displayXAccessor={displayXAccessor}
 				xExtents={xExtents}
 			>
-
 				<Chart id={1} height={400}
 					yExtents={[d => [d.high, d.low], ema26.accessor(), ema12.accessor()]}
 					padding={{ top: 10, bottom: 20 }}
@@ -210,11 +215,10 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 					<CurrentCoordinate yAccessor={ema12.accessor()} fill={ema12.stroke()} />
 
 					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-						yAccessor={d => d.close}
-						fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}
-					/>
+						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
 					<OHLCTooltip origin={[-40, 0]}/>
+
 					<MovingAverageTooltip
 						onClick={e => console.log(e)}
 						origin={[-38, 15]}
@@ -233,16 +237,19 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 							},
 						]}
 					/>
-
-					<FibonacciRetracement
-						ref={this.saveInteractiveNodes("FibonacciRetracement", 1)}
-						enabled={this.state.enableFib}
-						retracements={this.state.retracements_1}
-						onComplete={this.onFibComplete1}
+					<TrendLine
+						ref={this.saveInteractiveNodes("123", 1)}
+						enabled={this.state.enableTrendLine}
+						type="VERTICAL"
+						snap={false}
+						snapTo={d => [d.high, d.low]}
+						onStart={() => console.log("START")}
+						onComplete={this.onDrawCompleteChart1}
+						trends={this.state.trends_1}
 					/>
 				</Chart>
 				<Chart id={2} height={150}
-					yExtents={[d => d.volume, smaVolume50.accessor()]}
+					yExtents={[d => d.volume]}
 					origin={(w, h) => [0, h - 300]}
 				>
 					<YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
@@ -253,7 +260,6 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 						displayFormat={format(".4s")} />
 
 					<BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
-					<AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()}/>
 				</Chart>
 				<Chart id={3} height={150}
 					yExtents={macdCalculator.accessor()}
@@ -261,6 +267,7 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 				>
 					<XAxis axisAt="bottom" orient="bottom"/>
 					<YAxis axisAt="right" orient="right" ticks={2} />
+
 					<MouseCoordinateX
 						at="bottom"
 						orient="bottom"
@@ -269,18 +276,18 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 						at="right"
 						orient="right"
 						displayFormat={format(".2f")} />
-
+					<TrendLine
+						ref={this.saveInteractiveNodes("x", 3)}
+						enabled={this.state.enableTrendLine}
+						type="VERTICAL"
+						snap={false}
+						snapTo={d => [d.high, d.low]}
+						onStart={() => console.log("START")}
+						onComplete={this.onDrawCompleteChart3}
+						trends={this.state.trends_3}
+					/>
 					<MACDSeries yAccessor={d => d.macd}
 						{...macdAppearance} />
-
-					<FibonacciRetracement
-						ref={this.saveInteractiveNodes("FibonacciRetracement", 3)}
-						enabled={this.state.enableFib}
-						type="BOUND"
-						retracements={this.state.retracements_3}
-						onComplete={this.onFibComplete3}
-					/>
-
 					<MACDTooltip
 						origin={[-38, 15]}
 						yAccessor={d => d.macd}
@@ -290,10 +297,10 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 				</Chart>
 				<CrossHairCursor />
 				<DrawingObjectSelector
-					enabled={!this.state.enableFib}
+					enabled={!this.state.enableTrendLine}
 					getInteractiveNodes={this.getInteractiveNodes}
 					drawingObjectMap={{
-						FibonacciRetracement: "retracements"
+						Trendline: "trends"
 					}}
 					onSelect={this.handleSelection}
 				/>
@@ -301,17 +308,18 @@ class CandleStickChartWithFibonacciInteractiveIndicator extends React.Component 
 		);
 	}
 }
-CandleStickChartWithFibonacciInteractiveIndicator.propTypes = {
+
+CandlestickChart.propTypes = {
 	data: PropTypes.array.isRequired,
 	width: PropTypes.number.isRequired,
 	ratio: PropTypes.number.isRequired,
 	type: PropTypes.oneOf(["svg", "hybrid"]).isRequired,
 };
 
-CandleStickChartWithFibonacciInteractiveIndicator.defaultProps = {
+CandlestickChart.defaultProps = {
 	type: "svg",
 };
 
-CandleStickChartWithFibonacciInteractiveIndicator = fitWidth(CandleStickChartWithFibonacciInteractiveIndicator);
+const CandleStickChartWithInteractiveIndicator = fitWidth(CandlestickChart);
 
-export default CandleStickChartWithFibonacciInteractiveIndicator;
+export default CandleStickChartWithInteractiveIndicator;

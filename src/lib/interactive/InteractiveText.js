@@ -183,7 +183,7 @@ InteractiveText.defaultProps = {
 		enable: true,
 		bgHeight: 18,
 		bgWidth: 175,
-		text: "Click and drag the edge circles",
+		text: "Click and drag",
 	},
 	textList: [],
 };

@@ -275,18 +275,7 @@ EachTrendLine.defaultProps = {
 	onDragComplete: noop,
 	onSelect: noop,
 	onUnSelect: noop,
-
 	selected: false,
-
-	edgeStroke: "#000000",
-	edgeFill: "#FFFFFF",
-	fill: "#8AAFE2",
-	fillOpacity: 0.6,
-	edgeStrokeWidth: 2,
-	r: 5,
-	strokeWidth: 1,
-	strokeOpacity: 1,
-	strokeDasharray: "Solid",
 	hoverText: {
 		enable: false,
 	}
