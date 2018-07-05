@@ -144,7 +144,7 @@ class Angle extends Component {
         strokeDasharray={appearance.strokeDasharray}
         edgeStroke={appearance.edgeStroke}
         edgeFill={appearance.edgeFill}
-        text={appearance.text}
+        fontFill={appearance.fontFill}
         edgeStrokeWidth={appearance.edgeStrokeWidth}
         r={appearance.r}
         fill={appearance.fill}
@@ -172,7 +172,7 @@ class Angle extends Component {
 					strokeDasharray={eachAppearance.strokeDasharray}
 					edgeStroke={eachAppearance.edgeStroke}
 					edgeFill={eachAppearance.edgeFill}
-					text={eachAppearance.text}
+					fontFill={eachAppearance.fontFill}
 					edgeStrokeWidth={eachAppearance.edgeStrokeWidth}
 					r={eachAppearance.r}
 					fill={eachAppearance.fill}
@@ -233,7 +233,7 @@ Angle.propTypes = {
 		strokeDasharray: PropTypes.oneOf(strokeDashTypes),
 		edgeStrokeWidth: PropTypes.number.isRequired,
 		edgeFill: PropTypes.string.isRequired,
-		text: PropTypes.string.isRequired,
+		fontFill: PropTypes.string.isRequired,
 		edgeStroke: PropTypes.string.isRequired,
 		fill: PropTypes.string.isRequired,
 		fillOpacity: PropTypes.number.isRequired,
@@ -269,7 +269,7 @@ Angle.defaultProps = {
 		strokeDasharray: "Solid",
 		edgeStrokeWidth: 1,
 		edgeFill: "#FFFFFF",
-    text: "#000000",
+    fontFill: "#000000",
 		edgeStroke: "#000000",
 		r: 6,
 		fill: "#8AAFE2",

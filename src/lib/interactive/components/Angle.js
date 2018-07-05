@@ -97,7 +97,7 @@ class Angle extends Component {
 		return false;
 	}
 	drawOnCanvas(ctx, moreProps) {
-		const { stroke, strokeWidth, strokeOpacity, type, fill, fillOpacity, text } = this.props;
+		const { stroke, strokeWidth, strokeOpacity, type, fill, fillOpacity, fontFill } = this.props;
 		if (type === "ANGLE") {
 			const { x1, y1, x2, y2, x3, y3 } = helper(this.props, moreProps);
 			const rad = Math.atan2(y2 - y1, x2 - x1) || 0;
@@ -118,7 +118,7 @@ class Angle extends Component {
 			ctx.stroke();
 			if (x3 && y3) {
         ctx.font = "15px Arial";
-        ctx.fillStyle = text;
+        ctx.fillStyle = fontFill;
 				ctx.fillText(Math.round(- Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180) + "°", x3 + 5, y3 + 10);
 			}
 		} else if (type === "RECTANGLE") {
@@ -356,7 +356,7 @@ Angle.propTypes = {
 
 	r: PropTypes.number.isRequired,
 	edgeFill: PropTypes.string.isRequired,
-	text: PropTypes.string.isRequired,
+	fontFill: PropTypes.string.isRequired,
 	edgeStroke: PropTypes.string.isRequired,
 	edgeStrokeWidth: PropTypes.number.isRequired,
 	withEdge: PropTypes.bool.isRequired,

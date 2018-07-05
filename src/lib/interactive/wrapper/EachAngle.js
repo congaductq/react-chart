@@ -145,7 +145,7 @@ class EachAngle extends Component {
 			fillOpacity,
 			edgeStrokeWidth,
       edgeFill,
-      text,
+      fontFill,
 			edgeStroke,
 			edgeInteractiveCursor,
 			lineInteractiveCursor,
@@ -179,7 +179,7 @@ class EachAngle extends Component {
 				strokeOpacity={strokeOpacity}
 				strokeDasharray={strokeDasharray}
         fill={fill}
-        text={text}
+        fontFill={fontFill}
 				fillOpacity={fillOpacity}
 				interactiveCursorClass={lineInteractiveCursor}
 				onDragStart={this.handleLineDragStart}
@@ -269,7 +269,7 @@ EachAngle.propTypes = {
 	edgeInteractiveCursor: PropTypes.string.isRequired,
 	lineInteractiveCursor: PropTypes.string.isRequired,
 	edgeFill: PropTypes.string.isRequired,
-	text: PropTypes.string.isRequired,
+	fontFill: PropTypes.string.isRequired,
 	hoverText: PropTypes.object.isRequired,
 	fill: PropTypes.string.isRequired,
 	fillOpacity: PropTypes.number.isRequired,
