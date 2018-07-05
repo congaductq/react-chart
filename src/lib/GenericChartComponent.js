@@ -1,4 +1,4 @@
-
+"use strict";
 
 import PropTypes from "prop-types";
 import GenericComponent from "./GenericComponent";
@@ -15,6 +15,7 @@ const ALWAYS_TRUE_TYPES = [
 class GenericChartComponent extends GenericComponent {
 	constructor(props, context) {
 		super(props, context);
+
 		this.preCanvasDraw = this.preCanvasDraw.bind(this);
 		this.postCanvasDraw = this.postCanvasDraw.bind(this);
 		this.shouldTypeProceed = this.shouldTypeProceed.bind(this);
@@ -31,6 +32,7 @@ class GenericChartComponent extends GenericComponent {
 
 		const { chartConfig: { width, height } } = moreProps;
 		const { clip, edgeClip } = this.props;
+
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.scale(ratio, ratio);
 		if (edgeClip) {
@@ -55,7 +57,7 @@ class GenericChartComponent extends GenericComponent {
 		super.updateMoreProps(moreProps);
 		const { chartConfig: chartConfigList } = moreProps;
 
-		if (chartConfigList && Array.isArray(chartConfigList)) {
+		if (chartConfigList) {
 			const { chartId } = this.context;
 			const chartConfig = find(chartConfigList, each => each.id === chartId);
 			this.moreProps.chartConfig = chartConfig;

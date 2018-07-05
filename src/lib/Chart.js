@@ -1,4 +1,4 @@
-
+"use strict";
 import React from "react";
 import PropTypes from "prop-types";
 import { scaleLinear } from "d3-scale";
@@ -16,7 +16,7 @@ class Chart extends PureComponent {
 		this.yScale = this.yScale.bind(this);
 		this.listener = this.listener.bind(this);
 	}
-	UNSAFE_componentWillMount() {
+	componentWillMount() {
 		const { id } = this.props;
 		const { subscribe } = this.context;
 		subscribe("chart_" + id,

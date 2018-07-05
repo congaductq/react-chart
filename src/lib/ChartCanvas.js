@@ -1,4 +1,4 @@
-
+"use strict";
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
@@ -48,8 +48,8 @@ function shouldResetChart(thisProps, nextProps) {
 	});
 }
 
-function getCursorStyle() {
-	const tooltipStyle = `
+function getCursorStyle(useCrossHairStyleCursor) {
+	const style = `
 	.react-stockcharts-grabbing-cursor {
 		pointer-events: all;
 		cursor: -moz-grabbing;
@@ -63,7 +63,8 @@ function getCursorStyle() {
 	.react-stockcharts-tooltip-hover {
 		pointer-events: all;
 		cursor: pointer;
-	}
+	}`;
+	const tooltipStyle = `
 	.react-stockcharts-avoid-interaction {
 		pointer-events: none;
 	}
@@ -89,7 +90,7 @@ function getCursorStyle() {
 	.react-stockcharts-ew-resize-cursor {
 		cursor: ew-resize;
 	}`;
-	return (<style type="text/css">{tooltipStyle}</style>);
+	return (<style type="text/css">{useCrossHairStyleCursor ? style + tooltipStyle : tooltipStyle}</style>);
 }
 
 function getDimensions(props) {
@@ -104,7 +105,7 @@ function getXScaleDirection(flipXScale) {
 }
 
 function calculateFullData(props) {
-	const { data: fullData, plotFull, xScale, clamp, pointsPerPxThreshold, flipXScale } = props;
+	const { data: fullData, plotFull, xScale, clamp, pointsPerPxThreshold } = props;
 	const { xAccessor, displayXAccessor, minPointsPerPxThreshold } = props;
 
 	const useWholeData = isDefined(plotFull)
@@ -117,13 +118,12 @@ function calculateFullData(props) {
 		clamp,
 		pointsPerPxThreshold,
 		minPointsPerPxThreshold,
-		flipXScale,
 	});
 
 	return {
 		xAccessor,
 		displayXAccessor: displayXAccessor || xAccessor,
-		xScale: xScale.copy(),
+		xScale,
 		fullData,
 		filterData
 	};
@@ -243,7 +243,7 @@ function calculateState(props) {
 			const prev = data[i - 1];
 			const curr = data[i];
 			if (inputXAccesor(prev) > inputXAccesor(curr)) {
-				throw new Error("'data' is not sorted on 'xAccessor', send 'data' sorted in ascending order of 'xAccessor'");
+				throw new Error("'data' is not sorted on 'xAccessor', send 'data' sorted in assending order of 'xAccessor'");
 			}
 		}
 	}
@@ -426,9 +426,7 @@ class ChartCanvas extends Component {
 			.map(each => each.getPanConditions());
 	}
 	setCursorClass(className) {
-		if (this.eventCaptureNode != null) {
-			this.eventCaptureNode.setCursorClass(className);
-		}
+		this.eventCaptureNode.setCursorClass(className);
 	}
 	amIOnTop(id) {
 		const dragableComponents = this.subscriptions
@@ -549,8 +547,8 @@ class ChartCanvas extends Component {
 		this.triggerEvent("dragcancel");
 	}
 	handlePinchZoom(initialPinch, finalPinch, e) {
-		if (!this.waitingForPinchZoomAnimationFrame) {
-			this.waitingForPinchZoomAnimationFrame = true;
+		if (!this.waitingForAnimationFrame) {
+			this.waitingForAnimationFrame = true;
 			const state = this.pinchZoomHelper(initialPinch, finalPinch);
 
 			this.triggerEvent("pinchzoom", state, e);
@@ -560,7 +558,7 @@ class ChartCanvas extends Component {
 			requestAnimationFrame(() => {
 				this.clearBothCanvas();
 				this.draw({ trigger: "pinchzoom" });
-				this.waitingForPinchZoomAnimationFrame = false;
+				this.waitingForAnimationFrame = false;
 			});
 		}
 	}
@@ -615,6 +613,7 @@ class ChartCanvas extends Component {
 		const currentCharts = getCurrentCharts(chartConfig, mouseXY);
 
 		this.clearThreeCanvas();
+
 
 		const firstItem = head(fullData);
 
@@ -710,13 +709,15 @@ class ChartCanvas extends Component {
 		this.clearThreeCanvas();
 		this.draw({ force: true });
 	}
-	panHelper(mouseXY, initialXScale, { dx, dy }, chartsToPan) {
+	panHelper(mouseXY, initialXScale, panOrigin, chartsToPan) {
 		const { xAccessor, displayXAccessor, chartConfig: initialChartConfig } = this.state;
 		const { filterData } = this.state;
 		const { fullData } = this;
 		const { postCalculator } = this.props;
 
-		// console.log(dx, dy);
+		const dx = mouseXY[0] - panOrigin[0];
+		const dy = mouseXY[1] - panOrigin[1];
+
 		if (isNotDefined(initialXScale.invert))
 			throw new Error("xScale provided does not have an invert() method."
 				+ "You are likely using an ordinal scale. This scale does not support zoom, pan");
@@ -758,20 +759,20 @@ class ChartCanvas extends Component {
 			currentItem,
 		};
 	}
-	handlePan(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
+	handlePan(mousePosition, panStartXScale, panOrigin, chartsToPan, e) {
 		if (!this.waitingForPanAnimationFrame) {
 			this.waitingForPanAnimationFrame = true;
 
 			this.hackyWayToStopPanBeyondBounds__plotData = this.hackyWayToStopPanBeyondBounds__plotData || this.state.plotData;
 			this.hackyWayToStopPanBeyondBounds__domain = this.hackyWayToStopPanBeyondBounds__domain || this.state.xScale.domain();
 
-			const state = this.panHelper(mousePosition, panStartXScale, dxdy, chartsToPan);
+			const state = this.panHelper(mousePosition, panStartXScale, panOrigin, chartsToPan);
 
 			this.hackyWayToStopPanBeyondBounds__plotData = state.plotData;
 			this.hackyWayToStopPanBeyondBounds__domain = state.xScale.domain();
 
 			this.panInProgress = true;
-			// console.log(panStartXScale.domain(), state.xScale.domain());
+			// console.log(panStartXScale.domain(), state.xScale.domain())
 
 			this.triggerEvent("pan", state, e);
 
@@ -781,50 +782,12 @@ class ChartCanvas extends Component {
 				currentCharts: state.currentCharts,
 			};
 			requestAnimationFrame(() => {
+
 				this.waitingForPanAnimationFrame = false;
 				this.clearBothCanvas();
 				this.draw({ trigger: "pan" });
 			});
 		}
-	}
-	handlePanEnd(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
-		const state = this.panHelper(mousePosition, panStartXScale, dxdy, chartsToPan);
-		// console.log(this.canvasDrawCallbackList.map(d => d.type));
-		this.hackyWayToStopPanBeyondBounds__plotData = null;
-		this.hackyWayToStopPanBeyondBounds__domain = null;
-
-		this.panInProgress = false;
-
-		// console.log("PANEND", panEnd++);
-		const {
-			xScale,
-			plotData,
-			chartConfig,
-		} = state;
-
-		this.triggerEvent("panend", state, e);
-
-		requestAnimationFrame(() => {
-			const { xAccessor } = this.state;
-			const { fullData } = this;
-
-			const firstItem = head(fullData);
-			const start = head(xScale.domain());
-			const end = xAccessor(firstItem);
-			// console.log(start, end, start < end ? "Load more" : "I have it");
-
-			const { onLoadMore } = this.props;
-
-			this.clearThreeCanvas();
-
-			this.setState({
-				xScale,
-				plotData,
-				chartConfig,
-			}, () => {
-				if (start < end) onLoadMore(start, end);
-			});
-		});
 	}
 	handleMouseDown(mousePosition, currentCharts, e) {
 		this.triggerEvent("mousedown", this.mutableState, e);
@@ -835,8 +798,8 @@ class ChartCanvas extends Component {
 		}, e);
 	}
 	handleMouseMove(mouseXY, inputType, e) {
-		if (!this.waitingForMouseMoveAnimationFrame) {
-			this.waitingForMouseMoveAnimationFrame = true;
+		if (!this.waitingForAnimationFrame) {
+			this.waitingForAnimationFrame = true;
 
 			const { chartConfig, plotData, xScale, xAccessor } = this.state;
 			const currentCharts = getCurrentCharts(chartConfig, mouseXY);
@@ -860,7 +823,7 @@ class ChartCanvas extends Component {
 			requestAnimationFrame(() => {
 				this.clearMouseCanvas();
 				this.draw({ trigger: "mousemove" });
-				this.waitingForMouseMoveAnimationFrame = false;
+				this.waitingForAnimationFrame = false;
 			});
 		}
 	}
@@ -913,6 +876,45 @@ class ChartCanvas extends Component {
 	}
 	handleDoubleClick(mousePosition, e) {
 		this.triggerEvent("dblclick", {}, e);
+	}
+	handlePanEnd(mousePosition, panStartXScale, panOrigin, chartsToPan, e) {
+		const state = this.panHelper(mousePosition, panStartXScale, panOrigin, chartsToPan);
+		// console.log(this.canvasDrawCallbackList.map(d => d.type));
+		this.hackyWayToStopPanBeyondBounds__plotData = null;
+		this.hackyWayToStopPanBeyondBounds__domain = null;
+
+		this.panInProgress = false;
+
+		// console.log("PANEND", panEnd++);
+		const {
+			xScale,
+			plotData,
+			chartConfig,
+		} = state;
+
+		this.triggerEvent("panend", state, e);
+
+		requestAnimationFrame(() => {
+			const { xAccessor } = this.state;
+			const { fullData } = this;
+
+			const firstItem = head(fullData);
+			const start = head(xScale.domain());
+			const end = xAccessor(firstItem);
+			// console.log(start, end, start < end ? "Load more" : "I have it");
+
+			const { onLoadMore } = this.props;
+
+			this.clearThreeCanvas();
+
+			this.setState({
+				xScale,
+				plotData,
+				chartConfig,
+			}, () => {
+				if (start < end) onLoadMore(start, end);
+			});
+		});
 	}
 	getChildContext() {
 		const dimensions = getDimensions(this.props);
@@ -1057,8 +1059,7 @@ class ChartCanvas extends Component {
 
 		const interaction = isInteractionEnabled(xScale, xAccessor, plotData);
 
-		const cursorStyle = useCrossHairStyleCursor && interaction;
-		const cursor = getCursorStyle();
+		const cursor = getCursorStyle(useCrossHairStyleCursor && interaction);
 		return (
 			<div style={{ position: "relative", width, height }} className={className} onClick={onSelect}>
 				<CanvasContainer ref={this.saveCanvasContainerNode}
@@ -1079,7 +1080,6 @@ class ChartCanvas extends Component {
 					<g transform={`translate(${margin.left + 0.5}, ${margin.top + 0.5})`}>
 						<EventCapture
 							ref={this.saveEventCaptureNode}
-							useCrossHairStyleCursor={cursorStyle}
 							mouseMove={mouseMoveEvent && interaction}
 							zoom={zoomEvent && interaction}
 							pan={panEvent && interaction}
@@ -1090,7 +1090,6 @@ class ChartCanvas extends Component {
 							xScale={xScale}
 							xAccessor={xAccessor}
 							focus={defaultFocus}
-							disableInteraction={this.props.disableInteraction}
 
 							getAllPanConditions={this.getAllPanConditions}
 							onContextMenu={this.handleContextMenu}
@@ -1175,11 +1174,10 @@ ChartCanvas.propTypes = {
 	},
 	mouseMoveEvent: PropTypes.bool,
 	panEvent: PropTypes.bool,
-	clamp: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.func]),
+	clamp: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 	zoomEvent: PropTypes.bool,
 	onSelect: PropTypes.func,
 	maintainPointsPerPixelOnResize: PropTypes.bool,
-	disableInteraction: PropTypes.bool,
 };
 
 ChartCanvas.defaultProps = {
@@ -1206,7 +1204,6 @@ ChartCanvas.defaultProps = {
 	zoomAnchor: mouseBasedZoomAnchor,
 	maintainPointsPerPixelOnResize: true,
 	// ratio: 2,
-	disableInteraction: false,
 };
 
 ChartCanvas.childContextTypes = {
