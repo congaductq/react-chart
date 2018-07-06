@@ -1,3 +1,5 @@
+"use strict";
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -106,15 +108,8 @@ var GenericComponent = function (_Component) {
 					// DO NOT DRAW FOR THESE EVENTS
 					break;
 				case "mouseleave":
-					{
-						this.moreProps.hovering = false;
-						var moreProps = this.getMoreProps();
 
-						if (this.props.onUnHover) {
-							this.props.onUnHover(moreProps, e);
-						}
-						break;
-					}
+					break;
 				case "contextmenu":
 					{
 						if (this.props.onContextMenu) {
@@ -134,15 +129,15 @@ var GenericComponent = function (_Component) {
 					}
 				case "click":
 					{
-						var _moreProps = this.getMoreProps();
+						var moreProps = this.getMoreProps();
 						if (this.moreProps.hovering) {
 							// console.error("TODO use this only for SAR, Line series")
-							this.props.onClickWhenHover(_moreProps, e);
+							this.props.onClickWhenHover(moreProps, e);
 						} else {
-							this.props.onClickOutside(_moreProps, e);
+							this.props.onClickOutside(moreProps, e);
 						}
 						if (this.props.onClick) {
-							this.props.onClick(_moreProps, e);
+							this.props.onClick(moreProps, e);
 						}
 						break;
 					}
@@ -157,9 +152,7 @@ var GenericComponent = function (_Component) {
 						    setCursorClass = _context.setCursorClass;
 
 
-						if (this.moreProps.hovering && !this.props.selected
-						/* && !prevHover */
-						&& amIOnTop(this.suscriberId) && isDefined(this.props.onHover)) {
+						if (this.moreProps.hovering && !this.props.selected && !prevHover && isDefined(this.props.onHover)) {
 							setCursorClass("react-stockcharts-pointer-cursor");
 							this.iSetTheCursorClass = true;
 						} else if (this.moreProps.hovering && this.props.selected && amIOnTop(this.suscriberId)) {
@@ -169,33 +162,33 @@ var GenericComponent = function (_Component) {
 							this.iSetTheCursorClass = false;
 							setCursorClass(null);
 						}
-						var _moreProps2 = this.getMoreProps();
+						var _moreProps = this.getMoreProps();
 
 						if (this.moreProps.hovering && !prevHover) {
 							if (this.props.onHover) {
-								this.props.onHover(_moreProps2, e);
+								this.props.onHover(_moreProps, e);
 							}
 						}
 						if (prevHover && !this.moreProps.hovering) {
 							if (this.props.onUnHover) {
-								this.props.onUnHover(_moreProps2, e);
+								this.props.onUnHover(_moreProps, e);
 							}
 						}
 
 						if (this.props.onMouseMove) {
-							this.props.onMouseMove(_moreProps2, e);
+							this.props.onMouseMove(_moreProps, e);
 						}
 						break;
 					}
 				case "dblclick":
 					{
-						var _moreProps3 = this.getMoreProps();
+						var _moreProps2 = this.getMoreProps();
 
 						if (this.props.onDoubleClick) {
-							this.props.onDoubleClick(_moreProps3, e);
+							this.props.onDoubleClick(_moreProps2, e);
 						}
 						if (this.moreProps.hovering && this.props.onDoubleClickWhenHover) {
-							this.props.onDoubleClickWhenHover(_moreProps3, e);
+							this.props.onDoubleClickWhenHover(_moreProps2, e);
 						}
 						break;
 					}
@@ -216,7 +209,7 @@ var GenericComponent = function (_Component) {
 					}
 				case "dragstart":
 					{
-						if (this.getPanConditions().draggable) {
+						if (this.moreProps.hovering && this.props.selected) {
 							var _amIOnTop = this.context.amIOnTop;
 
 							if (_amIOnTop(this.suscriberId)) {
@@ -262,7 +255,7 @@ var GenericComponent = function (_Component) {
 	}, {
 		key: "getPanConditions",
 		value: function getPanConditions() {
-			var draggable = !!(this.props.selected && this.moreProps.hovering) || this.props.enableDragOnHover && this.moreProps.hovering;
+			var draggable = !!(this.props.selected && this.moreProps.hovering);
 
 			return {
 				draggable: draggable,
@@ -321,11 +314,6 @@ var GenericComponent = function (_Component) {
 			var unsubscribe = this.context.unsubscribe;
 
 			unsubscribe(this.suscriberId);
-			if (this.iSetTheCursorClass) {
-				var setCursorClass = this.context.setCursorClass;
-
-				setCursorClass(null);
-			}
 		}
 	}, {
 		key: "componentDidMount",
@@ -345,13 +333,7 @@ var GenericComponent = function (_Component) {
 			if (prevProps.selected !== selected) {
 				var setCursorClass = this.context.setCursorClass;
 
-				if (selected && this.moreProps.hovering) {
-					this.iSetTheCursorClass = true;
-					setCursorClass(interactiveCursorClass);
-				} else {
-					this.iSetTheCursorClass = false;
-					setCursorClass(null);
-				}
+				setCursorClass(selected && this.moreProps.hovering ? interactiveCursorClass : null);
 			}
 			if (isDefined(canvasDraw) && !this.evaluationInProgress
 			// && !(this.someDragInProgress && this.props.selected)
@@ -360,8 +342,6 @@ var GenericComponent = function (_Component) {
    during dragging / hover / click etc.
    */
 			&& chartCanvasType !== "svg") {
-
-				this.updateMoreProps(this.moreProps);
 				this.drawOnCanvas();
 			}
 		}
@@ -479,7 +459,6 @@ GenericComponent.propTypes = {
 	interactiveCursorClass: PropTypes.string,
 
 	selected: PropTypes.bool.isRequired,
-	enableDragOnHover: PropTypes.bool.isRequired,
 	disablePan: PropTypes.bool.isRequired,
 
 	canvasToDraw: PropTypes.func.isRequired,
@@ -518,7 +497,6 @@ GenericComponent.defaultProps = {
 	edgeClip: false,
 	selected: false,
 	disablePan: false,
-	enableDragOnHover: false,
 
 	onClickWhenHover: noop,
 	onClickOutside: noop,

@@ -17,18 +17,18 @@ import { isDefined, isNotDefined, noop, strokeDashTypes } from "../utils";
 
 import { getValueFromOverride, terminate, saveNodeType, isHoverForInteractiveType } from "./utils";
 
-import EachTrendLine from "./wrapper/EachTrendLine";
-import StraightLine from "./components/StraightLine";
+import EachFreeLine from "./wrapper/EachFreeLine";
+import FreeLineComponent from "./components/FreeLine";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
 
-var TrendLine = function (_Component) {
-	_inherits(TrendLine, _Component);
+var FreeLine = function (_Component) {
+	_inherits(FreeLine, _Component);
 
-	function TrendLine(props) {
-		_classCallCheck(this, TrendLine);
+	function FreeLine(props) {
+		_classCallCheck(this, FreeLine);
 
-		var _this = _possibleConstructorReturn(this, (TrendLine.__proto__ || Object.getPrototypeOf(TrendLine)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (FreeLine.__proto__ || Object.getPrototypeOf(FreeLine)).call(this, props));
 
 		_this.handleStart = _this.handleStart.bind(_this);
 		_this.handleEnd = _this.handleEnd.bind(_this);
@@ -46,7 +46,7 @@ var TrendLine = function (_Component) {
 		return _this;
 	}
 
-	_createClass(TrendLine, [{
+	_createClass(FreeLine, [{
 		key: "handleDragLine",
 		value: function handleDragLine(index, newXYValue) {
 			this.setState({
@@ -67,8 +67,7 @@ var TrendLine = function (_Component) {
 
 				var newTrends = trends.map(function (each, idx) {
 					return idx === override.index ? _extends({}, each, {
-						start: [override.x1Value, override.y1Value],
-						end: [override.x2Value, override.y2Value],
+						positionList: override.positionList,
 						selected: true
 					}) : _extends({}, each, {
 						selected: false
@@ -87,12 +86,13 @@ var TrendLine = function (_Component) {
 		value: function handleDrawLine(xyValue) {
 			var current = this.state.current;
 
-			if (isDefined(current) && isDefined(current.start)) {
+			if (isDefined(current) && isDefined(current.positionList.length > 0)) {
 				this.mouseMoved = true;
+				var positionList = current.positionList;
+				positionList.push(xyValue);
 				this.setState({
 					current: {
-						start: current.start,
-						end: xyValue
+						positionList: positionList
 					}
 				});
 			}
@@ -104,14 +104,13 @@ var TrendLine = function (_Component) {
 
 			var current = this.state.current;
 
-
-			if (isNotDefined(current) || isNotDefined(current.start)) {
+			if (isNotDefined(current) || isNotDefined(current.positionList)) {
 				this.mouseMoved = false;
-
+				var positionList = new Array();
+				positionList.push(xyValue);
 				this.setState({
 					current: {
-						start: xyValue,
-						end: null
+						positionList: positionList
 					}
 				}, function () {
 					_this3.props.onStart(moreProps, e);
@@ -126,19 +125,17 @@ var TrendLine = function (_Component) {
 			var current = this.state.current;
 			var _props = this.props,
 			    trends = _props.trends,
-			    appearance = _props.appearance,
-			    type = _props.type;
+			    appearance = _props.appearance;
 
-
-			if (this.mouseMoved && isDefined(current) && isDefined(current.start)) {
+			if (this.mouseMoved && isDefined(current) && isDefined(current.positionList.length > 100)) {
+				var positionList = current.positionList;
+				positionList.push(xyValue);
 				var newTrends = [].concat(_toConsumableArray(trends.map(function (d) {
 					return _extends({}, d, { selected: false });
 				})), [{
-					start: current.start,
-					end: xyValue,
+					positionList: positionList,
 					selected: true,
-					appearance: appearance,
-					type: type
+					appearance: appearance
 				}]);
 				this.setState({
 					current: null,
@@ -158,8 +155,7 @@ var TrendLine = function (_Component) {
 			    enabled = _props2.enabled,
 			    snap = _props2.snap,
 			    shouldDisableSnap = _props2.shouldDisableSnap,
-			    snapTo = _props2.snapTo,
-			    type = _props2.type;
+			    snapTo = _props2.snapTo;
 			var _props3 = this.props,
 			    currentPositionRadius = _props3.currentPositionRadius,
 			    currentPositionStroke = _props3.currentPositionStroke;
@@ -174,13 +170,9 @@ var TrendLine = function (_Component) {
 			    override = _state.override;
 
 
-			var tempLine = isDefined(current) && isDefined(current.end) ? React.createElement(StraightLine, {
-				type: type,
+			var tempLine = isDefined(current) && isDefined(current.positionList.length > 0) ? React.createElement(FreeLineComponent, {
 				noHover: true,
-				x1Value: current.start[0],
-				y1Value: current.start[1],
-				x2Value: current.end[0],
-				y2Value: current.end[1],
+				positionList: current.positionList,
 				stroke: appearance.stroke,
 				strokeWidth: appearance.strokeWidth,
 				fill: appearance.fill,
@@ -193,15 +185,12 @@ var TrendLine = function (_Component) {
 				trends.map(function (each, idx) {
 					var eachAppearance = isDefined(each.appearance) ? _extends({}, appearance, each.appearance) : appearance;
 
-					return React.createElement(EachTrendLine, { key: idx,
+					return React.createElement(EachFreeLine, { key: idx,
 						ref: _this5.saveNodeType(idx),
 						index: idx,
 						type: each.type,
 						selected: each.selected,
-						x1Value: getValueFromOverride(override, idx, "x1Value", each.start[0]),
-						y1Value: getValueFromOverride(override, idx, "y1Value", each.start[1]),
-						x2Value: getValueFromOverride(override, idx, "x2Value", each.end[0]),
-						y2Value: getValueFromOverride(override, idx, "y2Value", each.end[1]),
+						positionList: getValueFromOverride(override, idx, "positionList", each.positionList),
 						stroke: eachAppearance.stroke,
 						strokeWidth: eachAppearance.strokeWidth,
 						strokeOpacity: eachAppearance.strokeOpacity,
@@ -237,10 +226,10 @@ var TrendLine = function (_Component) {
 		}
 	}]);
 
-	return TrendLine;
+	return FreeLine;
 }(Component);
 
-TrendLine.propTypes = {
+FreeLine.propTypes = {
 	snap: PropTypes.bool.isRequired,
 	enabled: PropTypes.bool.isRequired,
 	snapTo: PropTypes.func,
@@ -254,12 +243,6 @@ TrendLine.propTypes = {
 	currentPositionStrokeWidth: PropTypes.number,
 	currentPositionstrokeOpacity: PropTypes.number,
 	currentPositionRadius: PropTypes.number,
-	type: PropTypes.oneOf(["XLINE", // extends from -Infinity to +Infinity
-	"RAY", // extends to +/-Infinity in one direction
-	"LINE", // extends between the set bounds
-	"ARROW", // arrow
-	"SELECT"] // select area
-	),
 	hoverText: PropTypes.object.isRequired,
 
 	trends: PropTypes.array.isRequired,
@@ -277,9 +260,7 @@ TrendLine.propTypes = {
 	}).isRequired
 };
 
-TrendLine.defaultProps = {
-	type: "XLINE",
-
+FreeLine.defaultProps = {
 	onStart: noop,
 	onComplete: noop,
 	onSelect: noop,
@@ -314,5 +295,5 @@ TrendLine.defaultProps = {
 	}
 };
 
-export default TrendLine;
-//# sourceMappingURL=TrendLine.js.map
+export default FreeLine;
+//# sourceMappingURL=FreeLine.js.map
