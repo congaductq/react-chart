@@ -11,3 +11,4 @@ export { default as DrawingObjectSelector } from "./DrawingObjectSelector";
 export { default as PitchFork } from "./PitchFork";
 export { default as Angle } from "./Angle";
 export { default as FullLine } from "./FullLine";
+export { default as FreeLine } from "./FreeLine";

@@ -11,12 +11,12 @@ import {
 	isHoverForInteractiveType,
 } from "./utils";
 
-import EachTrendLine from "./wrapper/EachTrendLine";
-import StraightLine from "./components/StraightLine";
+import EachFreeLine from "./wrapper/EachFreeLine";
+import FreeLineComponent from "./components/FreeLine";
 import MouseLocationIndicator from "./components/MouseLocationIndicator";
 import HoverTextNearMouse from "./components/HoverTextNearMouse";
 
-class TrendLine extends Component {
+class FreeLine extends Component {
 	constructor(props) {
 		super(props);
 
@@ -52,8 +52,7 @@ class TrendLine extends Component {
 				.map((each, idx) => idx === override.index
 					? {
 						...each,
-						start: [override.x1Value, override.y1Value],
-						end: [override.x2Value, override.y2Value],
+						positionList: override.positionList,
 						selected: true,
 					}
 					: {
@@ -70,26 +69,26 @@ class TrendLine extends Component {
 	}
 	handleDrawLine(xyValue) {
 		const { current } = this.state;
-		if (isDefined(current) && isDefined(current.start)) {
+		if (isDefined(current) && isDefined(current.positionList.length > 0)) {
 			this.mouseMoved = true;
+      const positionList = current.positionList;
+      positionList.push(xyValue);
 			this.setState({
 				current: {
-					start: current.start,
-					end: xyValue,
+					positionList,
 				}
 			});
 		}
 	}
 	handleStart(xyValue, moreProps, e) {
-		const { current } = this.state;
-
-		if (isNotDefined(current) || isNotDefined(current.start)) {
+    const { current } = this.state;
+		if (isNotDefined(current) || isNotDefined(current.positionList)) {
 			this.mouseMoved = false;
-
+      const positionList = new Array();
+      positionList.push(xyValue);
 			this.setState({
 				current: {
-					start: xyValue,
-					end: null,
+					positionList,
 				},
 			}, () => {
 				this.props.onStart(moreProps, e);
@@ -98,20 +97,19 @@ class TrendLine extends Component {
 	}
 	handleEnd(xyValue, moreProps, e) {
 		const { current } = this.state;
-		const { trends, appearance, type } = this.props;
-
+		const { trends, appearance } = this.props;
 		if (this.mouseMoved
 			&& isDefined(current)
-			&& isDefined(current.start)
+			&& isDefined(current.positionList.length > 100)
 		) {
+      const positionList = current.positionList;
+      positionList.push(xyValue);
 			const newTrends = [
 				...trends.map(d => ({ ...d, selected: false })),
 				{
-					start: current.start,
-					end: xyValue,
+          positionList,
 					selected: true,
 					appearance,
-					type,
 				}
 			];
 			this.setState({
@@ -124,20 +122,16 @@ class TrendLine extends Component {
 	}
 	render() {
 		const { appearance } = this.props;
-		const { enabled, snap, shouldDisableSnap, snapTo, type } = this.props;
+		const { enabled, snap, shouldDisableSnap, snapTo } = this.props;
 		const { currentPositionRadius, currentPositionStroke } = this.props;
 		const { currentPositionstrokeOpacity, currentPositionStrokeWidth } = this.props;
 		const { hoverText, trends } = this.props;
-		const { current, override } = this.state;
+    const { current, override } = this.state;
 
-		const tempLine = isDefined(current) && isDefined(current.end)
-			? <StraightLine
-				type={type}
+		const tempLine = isDefined(current) && isDefined(current.positionList.length > 0)
+			? <FreeLineComponent
 				noHover
-				x1Value={current.start[0]}
-				y1Value={current.start[1]}
-				x2Value={current.end[0]}
-				y2Value={current.end[1]}
+				positionList={current.positionList}
 				stroke={appearance.stroke}
 				strokeWidth={appearance.strokeWidth}
 				fill={appearance.fill}
@@ -151,15 +145,12 @@ class TrendLine extends Component {
 					? { ...appearance, ...each.appearance }
 					: appearance;
 
-				return <EachTrendLine key={idx}
+				return <EachFreeLine key={idx}
 					ref={this.saveNodeType(idx)}
 					index={idx}
 					type={each.type}
 					selected={each.selected}
-					x1Value={getValueFromOverride(override, idx, "x1Value", each.start[0])}
-					y1Value={getValueFromOverride(override, idx, "y1Value", each.start[1])}
-					x2Value={getValueFromOverride(override, idx, "x2Value", each.end[0])}
-					y2Value={getValueFromOverride(override, idx, "y2Value", each.end[1])}
+					positionList={getValueFromOverride(override, idx, "positionList", each.positionList)}
 					stroke={eachAppearance.stroke}
 					strokeWidth={eachAppearance.strokeWidth}
 					strokeOpacity={eachAppearance.strokeOpacity}
@@ -196,7 +187,7 @@ class TrendLine extends Component {
 }
 
 
-TrendLine.propTypes = {
+FreeLine.propTypes = {
 	snap: PropTypes.bool.isRequired,
 	enabled: PropTypes.bool.isRequired,
 	snapTo: PropTypes.func,
@@ -210,13 +201,6 @@ TrendLine.propTypes = {
 	currentPositionStrokeWidth: PropTypes.number,
 	currentPositionstrokeOpacity: PropTypes.number,
 	currentPositionRadius: PropTypes.number,
-	type: PropTypes.oneOf([
-		"XLINE", // extends from -Infinity to +Infinity
-		"RAY", // extends to +/-Infinity in one direction
-		"LINE", // extends between the set bounds
-		"ARROW", // arrow
-		"SELECT", // select area
-	]),
 	hoverText: PropTypes.object.isRequired,
 
 	trends: PropTypes.array.isRequired,
@@ -234,9 +218,7 @@ TrendLine.propTypes = {
 	}).isRequired
 };
 
-TrendLine.defaultProps = {
-	type: "XLINE",
-
+FreeLine.defaultProps = {
 	onStart: noop,
 	onComplete: noop,
 	onSelect: noop,
@@ -270,4 +252,4 @@ TrendLine.defaultProps = {
 	}
 };
 
-export default TrendLine;
+export default FreeLine;

@@ -29,7 +29,7 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { FreeLine as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
 
 import {
@@ -63,7 +63,6 @@ class CandlestickChart extends React.Component {
 		this.state = {
 			enableTrendLine: true,
 			trends_1: [
-				{ start: [1606, 56], end: [1711, 53], appearance: { stroke: "green" }, type: "XLINE" }
 			],
 			trends_3: []
 		};
@@ -83,7 +82,7 @@ class CandlestickChart extends React.Component {
 				`trends_${each.chartId}`,
 				each.objects,
 			];
-		});
+    });
 		this.setState(state);
 	}
 	onDrawCompleteChart1(trends_1) {
