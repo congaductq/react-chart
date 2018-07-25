@@ -147,7 +147,7 @@ var MovingAverageTooltip = function (_Component2) {
 				options.map(function (each, idx) {
 					var yValue = currentItem && each.yAccessor(currentItem);
 
-					var tooltipLabel = each.type + " (" + each.windowSize + ")";
+					var tooltipLabel = each.windowSize ? each.type + " (" + each.windowSize + ")" : "" + each.type;
 					var yDisplayValue = yValue ? displayFormat(yValue) : "n/a";
 					return React.createElement(SingleMAToolTip, {
 						key: idx,
@@ -195,7 +195,7 @@ MovingAverageTooltip.propTypes = {
 		yAccessor: PropTypes.func.isRequired,
 		type: PropTypes.string.isRequired,
 		stroke: PropTypes.string.isRequired,
-		windowSize: PropTypes.number.isRequired,
+		windowSize: PropTypes.number,
 		echo: PropTypes.any
 	}))
 };
