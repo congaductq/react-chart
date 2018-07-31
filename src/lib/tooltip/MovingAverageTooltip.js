@@ -79,7 +79,7 @@ class MovingAverageTooltip extends Component {
 					.map((each, idx) => {
 						const yValue = currentItem && each.yAccessor(currentItem);
 
-						const tooltipLabel = `${each.type} (${each.windowSize})`;
+						const tooltipLabel = each.windowSize ? `${each.type} (${each.windowSize})` : `${each.type}`;
 						const yDisplayValue = yValue ? displayFormat(yValue) : "n/a";
 						return <SingleMAToolTip
 							key={idx}
@@ -123,7 +123,7 @@ MovingAverageTooltip.propTypes = {
 		yAccessor: PropTypes.func.isRequired,
 		type: PropTypes.string.isRequired,
 		stroke: PropTypes.string.isRequired,
-		windowSize: PropTypes.number.isRequired,
+		windowSize: PropTypes.number,
 		echo: PropTypes.any,
 	})),
 };
