@@ -226,7 +226,7 @@ GannFan.defaultProps = {
 		...HoverTextNearMouse.defaultProps,
 		enable: true,
 		bgHeight: 18,
-		bgWidth: 120,
+		bgWidth: 90,
 		text: "Click to select",
 	},
 	fans: [],

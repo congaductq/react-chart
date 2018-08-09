@@ -29,7 +29,7 @@ import {
 } from "react-stockcharts/lib/tooltip";
 import { ema, macd } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { FreeLine as TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
+import { TrendLine, DrawingObjectSelector } from "react-stockcharts/lib/interactive";
 import { last, toObject } from "react-stockcharts/lib/utils";
 
 import {
@@ -89,7 +89,6 @@ class CandlestickChart extends React.Component {
 		// this gets called on
 		// 1. draw complete of trendline
 		// 2. drag complete of trendline
-		console.log(trends_1);
 		this.setState({
 			enableTrendLine: false,
 			trends_1
@@ -99,7 +98,6 @@ class CandlestickChart extends React.Component {
 		// this gets called on
 		// 1. draw complete of trendline
 		// 2. drag complete of trendline
-		console.log(trends_3);
 		this.setState({
 			enableTrendLine: false,
 			trends_3
@@ -107,7 +105,6 @@ class CandlestickChart extends React.Component {
 	}
 	onKeyPress(e) {
 		const keyCode = e.which;
-		console.log(keyCode);
 		switch (keyCode) {
 		case 46: { // DEL
 
@@ -118,6 +115,7 @@ class CandlestickChart extends React.Component {
 
 			this.canvasNode.cancelDrag();
 			this.setState({
+        enableTrendLine: true,
 				trends_1,
 				trends_3,
 			});
@@ -205,8 +203,8 @@ class CandlestickChart extends React.Component {
 						displayFormat={format(".2f")} />
 
 					<CandlestickSeries />
-					<LineSeries yAccessor={ema26.accessor()} stroke={ema26.stroke()}/>
-					<LineSeries yAccessor={ema12.accessor()} stroke={ema12.stroke()}/>
+					<LineSeries yAccessor={ema26.accessor()} stroke={ema26.stroke()} highlightOnHover/>
+					<LineSeries yAccessor={ema12.accessor()} stroke={ema12.stroke()} highlightOnHover/>
 
 					<CurrentCoordinate yAccessor={ema26.accessor()} fill={ema26.stroke()} />
 					<CurrentCoordinate yAccessor={ema12.accessor()} fill={ema12.stroke()} />
@@ -237,7 +235,7 @@ class CandlestickChart extends React.Component {
 					<TrendLine
 						ref={this.saveInteractiveNodes("Trendline", 1)}
 						enabled={this.state.enableTrendLine}
-						type="SELECT"
+						type="RAY"
 						snap={false}
 						snapTo={d => [d.high, d.low]}
 						onStart={() => console.log("START")}
@@ -273,16 +271,6 @@ class CandlestickChart extends React.Component {
 						at="right"
 						orient="right"
 						displayFormat={format(".2f")} />
-					<TrendLine
-						ref={this.saveInteractiveNodes("Trendline", 3)}
-						enabled={this.state.enableTrendLine}
-						type="SELECT"
-						snap={false}
-						snapTo={d => [d.high, d.low]}
-						onStart={() => console.log("START")}
-						onComplete={this.onDrawCompleteChart3}
-						trends={this.state.trends_3}
-					/>
 					<MACDSeries yAccessor={d => d.macd}
 						{...macdAppearance} />
 					<MACDTooltip

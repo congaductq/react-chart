@@ -214,7 +214,7 @@ LineSeries.defaultProps = {
 	className: "line ",
 	strokeWidth: 1,
 	strokeOpacity: 1,
-	hoverStrokeWidth: 4,
+	hoverStrokeWidth: 2,
 	fill: "none",
 	stroke: "#4682B4",
 	strokeDasharray: "Solid",
