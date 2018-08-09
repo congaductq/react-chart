@@ -1,11 +1,11 @@
 {
-  "name": "react-stockcharts",
-  "version": "0.7.9",
+  "name": "react-cryptocharts",
+  "version": "0.0.2",
   "description": "Highly customizable stock charts with ReactJS and d3",
   "main": "src/index.js",
   "module": "src/index.js",
   "author": {
-    "name": "Ragu Ramaswamy"
+    "name": "DucDV"
   },
   "homepage": "http://rrag.github.io/react-stockcharts/",
   "license": "MIT",

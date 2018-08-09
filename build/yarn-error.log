@@ -1,0 +1,101 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js publish --tag next
+
+PATH: 
+  D:\Setup\React\cmd\bin;D:\Setup\React\cmd\vendor\conemu-maximus5\ConEmu\Scripts;D:\Setup\React\cmd\vendor\conemu-maximus5;D:\Setup\React\cmd\vendor\conemu-maximus5\ConEmu;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\Git\cmd;C:\Program Files\Microsoft VS Code\bin;C:\WINDOWS\System32\OpenSSH\;C:\Users\Kendy\AppData\Local\Microsoft\WindowsApps;C:\Users\Kendy\AppData\Roaming\npm;C:\Users\Kendy\AppData\Local\Yarn\bin;C:\Program Files\heroku\bin;C:\Program Files\Git\mingw64;C:\Program Files\Git\usr\bin;D:\Setup\React\cmd
+
+Yarn version: 
+  1.7.0
+
+Node version: 
+  8.11.2
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:131036:13)
+      at emitNone (events.js:106:13)
+      at Interface.emit (events.js:208:7)
+      at Interface._ttyWrite (readline.js:774:16)
+      at ReadStream.onkeypress (readline.js:158:10)
+      at emitTwo (events.js:126:13)
+      at ReadStream.emit (events.js:214:7)
+      at emitKeys (internal/readline.js:420:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1010:36)
+
+npm manifest: 
+  {
+    "name": "react-cryptocharts",
+    "version": "0.0.3",
+    "description": "Highly customizable stock charts with ReactJS and d3",
+    "main": "index.js",
+    "module": "es/index.js",
+    "author": {
+      "name": "DucDV"
+    },
+    "homepage": "http://rrag.github.io/react-stockcharts/",
+    "license": "MIT",
+    "dependencies": {
+      "d3-array": "^1.2.1",
+      "d3-collection": "^1.0.4",
+      "d3-force": "^1.1.0",
+      "d3-format": "^1.2.1",
+      "d3-interpolate": "^1.1.6",
+      "d3-path": "^1.0.5",
+      "d3-scale": "^1.0.7",
+      "d3-selection": "^1.2.0",
+      "d3-shape": "^1.2.0",
+      "d3-time": "^1.0.8",
+      "d3-time-format": "^2.1.1",
+      "debug": "^3.1.0",
+      "lodash.flattendeep": "^4.4.0",
+      "prop-types": "^15.6.0",
+      "save-svg-as-png": "^1.4.5"
+    },
+    "peerDependencies": {
+      "react": "^15.0.0 || ^16.0.0",
+      "react-dom": "^15.0.0 || ^16.0.0"
+    },
+    "keywords": [
+      "charts",
+      "charting",
+      "stockcharts",
+      "finance",
+      "financechart",
+      "react",
+      "ReactJS",
+      "d3",
+      "react-component",
+      "react-charts",
+      "chart-components",
+      "javascript-finance-chart",
+      "javascript-stockchart",
+      "data-visualization",
+      "data-viz",
+      "d3-finance-chart",
+      "d3-stockchart"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/rrag/react-stockcharts.git"
+    },
+    "bugs": {
+      "url": "https://github.com/rrag/react-stockcharts/issues"
+    },
+    "maintainers": [
+      {
+        "name": "rrag",
+        "email": "ragunath.ramaswamy@gmail.com"
+      }
+    ],
+    "esnext": "es/index.js"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
