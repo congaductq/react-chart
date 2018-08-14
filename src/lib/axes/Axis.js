@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { forceSimulation, forceX, forceCollide } from "d3-force";
 import { range as d3Range } from "d3-array";
+import { scaleLog } from 'd3-scale';
 
 import GenericChartComponent from "../GenericChartComponent";
 import { getAxisCanvas } from "../GenericComponent";
@@ -120,12 +121,22 @@ Axis.defaultProps = {
 	edgeClip: false,
 };
 
+function multipleToBase(number) {
+  if (number < 1 && number > 0) return multipleToBase(number * 10);
+  if (number > 10) return multipleToBase(number / 10);
+  return number;
+}
+
+function isOdd(number) {
+  return (parseInt(multipleToBase(number).toString().substr(0, 1)) === 1 || (parseInt(multipleToBase(number).toString().substr(0, 1)) % 2));
+}
+
 function tickHelper(props, scale) {
 	const {
 		orient, innerTickSize, tickFormat, tickPadding,
 		tickLabelFill, tickStrokeWidth, tickStrokeDasharray,
 		fontSize, fontFamily, fontWeight, showTicks, flexTicks,
-		showTickLabel
+		showTickLabel, scaleType,
 	} = props;
 	const {
 		ticks: tickArguments, tickValues: tickValuesProp,
@@ -149,7 +160,8 @@ function tickHelper(props, scale) {
 			? tickIntervalFunction(min, max, tickInterval)
 			: baseTickValues;
 	} else if (isDefined(scale.ticks)) {
-		tickValues = scale.ticks(tickArguments, flexTicks);
+    tickValues = scale.ticks(tickArguments, flexTicks);
+    tickValues = (tickValues.length > 10) ? (scaleType === "log" ? tickValues.filter(x => !isOdd(x)) : tickValues.filter((value, index) => index % 2)) : tickValues;
 	} else {
 		tickValues = scale.domain();
 	}

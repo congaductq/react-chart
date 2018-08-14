@@ -88,7 +88,7 @@ class InteractiveText extends Component {
 			ctx.beginPath();
 			ctx.fillText(text, x, y);
 		} else if (type === "BUBBLE") {
-      ctx.strokeStyle = hexToRGBA(bgFill, bgOpacity);
+			ctx.strokeStyle = hexToRGBA(bgFill, bgOpacity);
 			ctx.beginPath();
 			ctx.moveTo(rect.x, rect.y - arrowHeight);
 			ctx.lineTo(rect.x, rect.y);

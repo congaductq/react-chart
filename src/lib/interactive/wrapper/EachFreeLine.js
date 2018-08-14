@@ -40,29 +40,29 @@ class EachTrendLine extends Component {
 		} = this.props;
 
 		this.dragStart = {
-      positionList
+			positionList
 		};
 	}
 	handleLineDrag(moreProps) {
 		const { index, onDrag } = this.props;
 
 		const {
-      positionList
+			positionList
 		} = this.dragStart;
 
 		const { xScale, chartConfig: { yScale }, xAccessor, fullData } = moreProps;
 		const { startPos, mouseXY } = moreProps;
-    const convertedList = new Array();
-    positionList.forEach(element => {
-      convertedList.push([xScale(element[0]), yScale(element[1])]);
-    });
+		const convertedList = new Array();
+		positionList.forEach(element => {
+			convertedList.push([xScale(element[0]), yScale(element[1])]);
+		});
 		const dx = startPos[0] - mouseXY[0];
-    const dy = startPos[1] - mouseXY[1];
-    const posList = convertedList.map(x => {
-      return (
-        [getXValue(xScale, xAccessor, [x[0] - dx, x[1] - dy], fullData),  yScale.invert(x[1] - dy)]
-      )
-    })
+		const dy = startPos[1] - mouseXY[1];
+		const posList = convertedList.map(x => {
+			return (
+				[getXValue(xScale, xAccessor, [x[0] - dx, x[1] - dy], fullData),  yScale.invert(x[1] - dy)]
+			);
+		});
 
 		onDrag(index, {
 			positionList: posList,
@@ -139,7 +139,7 @@ class EachTrendLine extends Component {
 			hoverText,
 			selected,
 			onDragComplete,
-    } = this.props;
+		} = this.props;
 		const { hover, anchor } = this.state;
 		// console.log("SELECTED ->", selected);
 		const { enable: hoverTextEnabled, ...restHoverTextProps } = hoverText;

@@ -71,8 +71,8 @@ class FreeLine extends Component {
 		const { current } = this.state;
 		if (isDefined(current) && isDefined(current.positionList.length > 0)) {
 			this.mouseMoved = true;
-      const positionList = current.positionList;
-      positionList.push(xyValue);
+			const positionList = current.positionList;
+			positionList.push(xyValue);
 			this.setState({
 				current: {
 					positionList,
@@ -81,11 +81,11 @@ class FreeLine extends Component {
 		}
 	}
 	handleStart(xyValue, moreProps, e) {
-    const { current } = this.state;
+		const { current } = this.state;
 		if (isNotDefined(current) || isNotDefined(current.positionList)) {
 			this.mouseMoved = false;
-      const positionList = new Array();
-      positionList.push(xyValue);
+			const positionList = new Array();
+			positionList.push(xyValue);
 			this.setState({
 				current: {
 					positionList,
@@ -102,12 +102,12 @@ class FreeLine extends Component {
 			&& isDefined(current)
 			&& isDefined(current.positionList.length > 100)
 		) {
-      const positionList = current.positionList;
-      positionList.push(xyValue);
+			const positionList = current.positionList;
+			positionList.push(xyValue);
 			const newTrends = [
 				...trends.map(d => ({ ...d, selected: false })),
 				{
-          positionList,
+					positionList,
 					selected: true,
 					appearance,
 				}
@@ -126,7 +126,7 @@ class FreeLine extends Component {
 		const { currentPositionRadius, currentPositionStroke } = this.props;
 		const { currentPositionstrokeOpacity, currentPositionStrokeWidth } = this.props;
 		const { hoverText, trends } = this.props;
-    const { current, override } = this.state;
+		const { current, override } = this.state;
 
 		const tempLine = isDefined(current) && isDefined(current.positionList.length > 0)
 			? <FreeLineComponent

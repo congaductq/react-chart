@@ -138,17 +138,17 @@ class Angle extends Component {
 				y1Value={current.start[1]}
 				x2Value={current.end[0]}
 				y2Value={current.end[1]}
-        stroke={appearance.stroke}
-        strokeWidth={appearance.strokeWidth}
-        strokeOpacity={appearance.strokeOpacity}
-        strokeDasharray={appearance.strokeDasharray}
-        edgeStroke={appearance.edgeStroke}
-        edgeFill={appearance.edgeFill}
-        fontFill={appearance.fontFill}
-        edgeStrokeWidth={appearance.edgeStrokeWidth}
-        r={appearance.r}
-        fill={appearance.fill}
-        fillOpacity={appearance.fillOpacity}
+				stroke={appearance.stroke}
+				strokeWidth={appearance.strokeWidth}
+				strokeOpacity={appearance.strokeOpacity}
+				strokeDasharray={appearance.strokeDasharray}
+				edgeStroke={appearance.edgeStroke}
+				edgeFill={appearance.edgeFill}
+				fontFill={appearance.fontFill}
+				edgeStrokeWidth={appearance.edgeStrokeWidth}
+				r={appearance.r}
+				fill={appearance.fill}
+				fillOpacity={appearance.fillOpacity}
 			/>
 			: null;
 
@@ -269,11 +269,11 @@ Angle.defaultProps = {
 		strokeDasharray: "Solid",
 		edgeStrokeWidth: 1,
 		edgeFill: "#FFFFFF",
-    fontFill: "#000000",
+		fontFill: "#000000",
 		edgeStroke: "#000000",
 		r: 6,
 		fill: "#8AAFE2",
-    fillOpacity: 0.4,
+		fillOpacity: 0.4,
 	}
 };
 

@@ -24,39 +24,39 @@ class StraightLine extends Component {
 		const { tolerance, onHover } = this.props;
 
 		if (isDefined(onHover)) {
-      const { positionList } = this.props;
-				const { mouseXY, xScale, chartConfig: { yScale } } = moreProps;
-				for (let i = 0; i < positionList.length - 1; i++) {
-          const x1Value = positionList[i][0];
-          const y1Value = positionList[i][1];
-          const x2Value = positionList[i + 1][0];
-          const y2Value = positionList[i + 1][1];
-          const value =  isHovering({
-            x1Value, y1Value,
-            x2Value, y2Value,
-            mouseXY,
-            tolerance,
-            xScale,
-            yScale,
-          });
-          if (value) {
+			const { positionList } = this.props;
+			const { mouseXY, xScale, chartConfig: { yScale } } = moreProps;
+			for (let i = 0; i < positionList.length - 1; i++) {
+				const x1Value = positionList[i][0];
+				const y1Value = positionList[i][1];
+				const x2Value = positionList[i + 1][0];
+				const y2Value = positionList[i + 1][1];
+				const value =  isHovering({
+					x1Value, y1Value,
+					x2Value, y2Value,
+					mouseXY,
+					tolerance,
+					xScale,
+					yScale,
+				});
+				if (value) {
 				    return true;
-          }
-        }
+				}
+			}
 		}
 		return false;
 	}
 	drawOnCanvas(ctx, moreProps) {
-    const { stroke, strokeWidth, strokeOpacity, positionList } = this.props;
+		const { stroke, strokeWidth, strokeOpacity, positionList } = this.props;
 	  const { xScale, chartConfig: { yScale } } = moreProps;
 		ctx.lineWidth = strokeWidth;
 		ctx.strokeStyle = hexToRGBA(stroke, strokeOpacity);
-    ctx.beginPath();
-    ctx.moveTo(xScale(positionList[0][0]), yScale(positionList[0][1]));
-    positionList.slice(1).forEach(element => {
-      ctx.lineTo(xScale(element[0]), yScale(element[1]));
-    });
-    ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(xScale(positionList[0][0]), yScale(positionList[0][1]));
+		positionList.slice(1).forEach(element => {
+			ctx.lineTo(xScale(element[0]), yScale(element[1]));
+		});
+		ctx.stroke();
 	}
 	renderSVG(moreProps) {
 		const { stroke, strokeWidth, strokeOpacity, strokeDasharray } = this.props;
@@ -129,7 +129,7 @@ export function isHovering({
 		end: [x2Value, y2Value],
 		xScale,
 		yScale,
-  });
+	});
 
 	const start = [xScale(line.x1), yScale(line.y1)];
 	const end = [xScale(line.x2), yScale(line.y2)];
@@ -194,8 +194,8 @@ export function generateLine({
 	// console.log(end[0] - start[0], m)
 	const b /* y intercept */ = getYIntercept(m, start);
 	return getLineCoordinates({
-    start, end, xScale, yScale, m, b
-  });
+		start, end, xScale, yScale, m, b
+	});
 }
 
 function getLineCoordinates({

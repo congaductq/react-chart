@@ -117,8 +117,8 @@ class Angle extends Component {
 			ctx.lineTo(x1, y1);
 			ctx.stroke();
 			if (x3 && y3) {
-        ctx.font = "15px Arial";
-        ctx.fillStyle = fontFill;
+				ctx.font = "15px Arial";
+				ctx.fillStyle = fontFill;
 				ctx.fillText(Math.round(- Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180) + "°", x3 + 5, y3 + 10);
 			}
 		} else if (type === "RECTANGLE") {

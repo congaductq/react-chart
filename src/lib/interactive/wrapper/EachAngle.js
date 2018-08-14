@@ -144,8 +144,8 @@ class EachAngle extends Component {
 			fill,
 			fillOpacity,
 			edgeStrokeWidth,
-      edgeFill,
-      fontFill,
+			edgeFill,
+			fontFill,
 			edgeStroke,
 			edgeInteractiveCursor,
 			lineInteractiveCursor,
@@ -178,8 +178,8 @@ class EachAngle extends Component {
 				strokeWidth={(hover || selected) ? strokeWidth + 1 : strokeWidth}
 				strokeOpacity={strokeOpacity}
 				strokeDasharray={strokeDasharray}
-        fill={fill}
-        fontFill={fontFill}
+				fill={fill}
+				fontFill={fontFill}
 				fillOpacity={fillOpacity}
 				interactiveCursorClass={lineInteractiveCursor}
 				onDragStart={this.handleLineDragStart}
