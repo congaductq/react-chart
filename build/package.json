@@ -1,6 +1,6 @@
 {
   "name": "react-cryptocharts",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Highly customizable stock charts with ReactJS and d3",
   "main": "index.js",
   "module": "es/index.js",
