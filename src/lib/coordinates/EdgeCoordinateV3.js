@@ -243,30 +243,31 @@ export function drawOnCanvas(ctx, props) {
 		const halfHeight = rectHeight / 2;
 
 		ctx.beginPath();
-		if (edge.orient === "right") {
-			x -= arrowWidth;
-			ctx.moveTo(x, y + halfHeight);
-			ctx.lineTo(x + arrowWidth, y);
-			ctx.lineTo(x + rectWidth + arrowWidth, y);
-			ctx.lineTo(x + rectWidth + arrowWidth, y + rectHeight);
-			ctx.lineTo(x + arrowWidth, y + rectHeight);
-			ctx.closePath();
-		} else if (edge.orient === "left") {
-			// x += arrowWidth;
-			ctx.moveTo(x, y);
-			ctx.lineTo(x + rectWidth, y);
-			ctx.lineTo(x + rectWidth + arrowWidth, y + halfHeight);
-			ctx.lineTo(x + rectWidth, y + rectHeight);
-			ctx.lineTo(x, y + rectHeight);
-			ctx.closePath();
-		} else {
-			// console.error(x, y, rectWidth, rectHeight)
-			if (rectRadius) {
-				roundRect(ctx, x, y, rectWidth, rectHeight, 3);
-			} else {
-				ctx.rect(x, y, rectWidth, rectHeight);
-			}
-		}
+		// if (edge.orient === "right") {
+		// 	x -= arrowWidth;
+		// 	ctx.moveTo(x, y + halfHeight);
+		// 	ctx.lineTo(x + arrowWidth, y);
+		// 	ctx.lineTo(x + rectWidth + arrowWidth, y);
+		// 	ctx.lineTo(x + rectWidth + arrowWidth, y + rectHeight);
+		// 	ctx.lineTo(x + arrowWidth, y + rectHeight);
+		// 	ctx.closePath();
+		// } else if (edge.orient === "left") {
+		// 	// x += arrowWidth;
+		// 	ctx.moveTo(x, y);
+		// 	ctx.lineTo(x + rectWidth, y);
+		// 	ctx.lineTo(x + rectWidth + arrowWidth, y + halfHeight);
+		// 	ctx.lineTo(x + rectWidth, y + rectHeight);
+		// 	ctx.lineTo(x, y + rectHeight);
+		// 	ctx.closePath();
+		// } else {
+		// 	// console.error(x, y, rectWidth, rectHeight)
+		// 	if (rectRadius) {
+		// 		roundRect(ctx, x, y, rectWidth, rectHeight, 3);
+		// 	} else {
+		// 		ctx.rect(x, y, rectWidth, rectHeight);
+		// 	}
+		// }
+    roundRect(ctx, x, y, rectWidth, rectHeight, 3);
 		ctx.fill();
 
 		if (isDefined(edge.coordinateBase.stroke)) {

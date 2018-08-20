@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { forceSimulation, forceX, forceCollide } from "d3-force";
 import { range as d3Range } from "d3-array";
-import { scaleLog } from 'd3-scale';
 
 import GenericChartComponent from "../GenericChartComponent";
 import { getAxisCanvas } from "../GenericComponent";
@@ -32,7 +31,7 @@ class Axis extends Component {
 
 		if (showDomain) drawAxisLine(ctx, this.props, range);
 		if (showTicks) {
-			const tickProps = tickHelper(this.props, getScale(moreProps));
+      const tickProps = tickHelper(this.props, getScale(moreProps));
 			drawTicks(ctx, tickProps);
 		}
 
@@ -53,8 +52,8 @@ class Axis extends Component {
 	render() {
 		const { bg, axisZoomCallback, zoomCursorClassName, zoomEnabled, getScale, inverted } = this.props;
 		const { transform, getMouseDelta, edgeClip } = this.props;
-		const { onContextMenu, onDoubleClick } = this.props;
-
+    const { onContextMenu, onDoubleClick } = this.props;
+    
 		const zoomCapture = zoomEnabled
 			? <AxisZoomCapture
 				bg={bg}
@@ -122,13 +121,21 @@ Axis.defaultProps = {
 };
 
 function multipleToBase(number) {
-  if (number < 1 && number > 0) return multipleToBase(number * 10);
-  if (number > 10) return multipleToBase(number / 10);
-  return number;
+	if (number < 1 && number > 0) return multipleToBase(number * 10);
+	if (number > 10) return multipleToBase(number / 10);
+	return number;
 }
 
 function isOdd(number) {
-  return (parseInt(multipleToBase(number).toString().substr(0, 1)) === 1 || (parseInt(multipleToBase(number).toString().substr(0, 1)) % 2));
+  if (parseInt(multipleToBase(number).toString().substr(0, 1)) === 1) return 0;
+	return (parseInt(multipleToBase(number).toString().substr(0, 1)) % 2);
+}
+
+function isFiveBase(number) {
+  if (number === 0) return 1;
+  if (parseInt(multipleToBase(number).toString().substr(0, 1)) === 1) return 1;
+  if (parseInt(multipleToBase(number).toString().substr(0, 1)) === 5) return 1;
+  return 0
 }
 
 function tickHelper(props, scale) {
@@ -161,15 +168,21 @@ function tickHelper(props, scale) {
 			: baseTickValues;
 	} else if (isDefined(scale.ticks)) {
     tickValues = scale.ticks(tickArguments, flexTicks);
-    tickValues = (tickValues.length > 10) ? (scaleType === "log" ? tickValues.filter(x => !isOdd(x)) : tickValues.filter((value, index) => index % 2)) : tickValues;
+    if (scaleType === "log") {
+      if (tickValues.length >= 20) {
+        tickValues = tickValues.filter(x => isFiveBase(x))
+      } else if (tickValues.length >= 10) {
+        tickValues = tickValues.filter(x => !isOdd(x))
+      }
+    }
 	} else {
 		tickValues = scale.domain();
 	}
 
 	const baseFormat = scale.tickFormat
 		? scale.tickFormat(tickArguments)
-		: identity;
-
+    : identity;
+    
 	const format = isNotDefined(tickFormat)
 		? baseFormat
 		: d => tickFormat(d) || "";
@@ -185,7 +198,7 @@ function tickHelper(props, scale) {
 		textAnchor = "middle";
 
 		ticks = tickValues.map(d => {
-			const x = Math.round(scale(d));
+      const x = Math.round(scale(d));
 			return {
 				value: d,
 				x1: x,
