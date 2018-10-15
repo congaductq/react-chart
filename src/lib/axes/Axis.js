@@ -171,7 +171,8 @@ function tickHelper(props, scale) {
     if (scaleType === "log") {
       if (tickValues.length >= 20) {
         tickValues = tickValues.filter(x => isFiveBase(x))
-      } else if (tickValues.length >= 10) {
+      } 
+      if (tickValues.length >= 10) {
         tickValues = tickValues.filter(x => !isOdd(x))
       }
     }

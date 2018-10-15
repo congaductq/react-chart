@@ -21,13 +21,13 @@ class SingleMAToolTip extends Component {
 		onClick({ chartId: forChart, ...options }, e);
 	}
 	render() {
-		const { textFill, labelFill } = this.props;
+		const { textFill, labelFill, interactiveMode } = this.props;
 		const translate = "translate(" + this.props.origin[0] + ", " + this.props.origin[1] + ")";
 		return (
 			<g transform={translate}>
 				<ToolTipText x={5} y={11}
 					fontFamily={this.props.fontFamily} fontSize={this.props.fontSize}>
-					<tspan x="5" dy="15" fill={textFill}><ToolTipTSpanLabel fill={labelFill}>{this.props.displayName}: </ToolTipTSpanLabel>{this.props.value}</tspan>
+					<tspan x="5" dy="15" fill={textFill}><ToolTipTSpanLabel fill={labelFill}>{this.props.displayName}{interactiveMode ? ": " : ""}</ToolTipTSpanLabel>{interactiveMode ? this.props.value : ""}</tspan>
 				</ToolTipText>
 				<rect x={0} y={0} width={55} height={30}
 					onClick={this.handleClick}
@@ -57,7 +57,7 @@ class MovingAverageTooltip extends Component {
 		this.renderSVG = this.renderSVG.bind(this);
 	}
 	renderSVG(moreProps) {
-		const { displayValuesFor } = this.props;
+		const { displayValuesFor, interactiveMode } = this.props;
 
 		const { chartId } = moreProps;
 		const { chartConfig } = moreProps;
@@ -93,7 +93,8 @@ class MovingAverageTooltip extends Component {
 							fontFamily={fontFamily}
 							fontSize={fontSize}
 							textFill={textFill}
-							labelFill={labelFill}
+              labelFill={labelFill}
+              interactiveMode={interactiveMode}
 						/>;
 					})}
 			</g>
@@ -126,6 +127,7 @@ MovingAverageTooltip.propTypes = {
 		windowSize: PropTypes.number,
 		echo: PropTypes.any,
 	})),
+	interactiveMode: PropTypes.bool,
 };
 
 MovingAverageTooltip.defaultProps = {
@@ -134,6 +136,7 @@ MovingAverageTooltip.defaultProps = {
 	displayValuesFor: displayValuesFor,
 	origin: [0, 10],
 	width: 65,
+	interactiveMode: false,
 };
 
 export default MovingAverageTooltip;

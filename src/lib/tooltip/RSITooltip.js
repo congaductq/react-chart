@@ -16,7 +16,7 @@ class RSITooltip extends Component {
 		this.renderSVG = this.renderSVG.bind(this);
 	}
 	renderSVG(moreProps) {
-		const { onClick, fontFamily, fontSize, yAccessor, displayFormat, className } = this.props;
+		const { onClick, fontFamily, fontSize, yAccessor, displayFormat, className, interactiveMode } = this.props;
 		const { options, labelFill, textFill } = this.props;
 		const { displayValuesFor } = this.props;
 		const { chartConfig: { width, height } } = moreProps;
@@ -29,13 +29,13 @@ class RSITooltip extends Component {
 		const origin = functor(originProp);
 		const [x, y] = origin(width, height);
 
-		const tooltipLabel = `RSI (${options.windowSize}): `;
+		const tooltipLabel = `RSI (${options.windowSize})${interactiveMode ? ": " : ""}`;
 		return (
 			<g className={className} transform={`translate(${ x }, ${ y })`} onClick={onClick}>
 				<ToolTipText x={0} y={0}
 					fontFamily={fontFamily} fontSize={fontSize}>
 					<ToolTipTSpanLabel fill={labelFill}>{tooltipLabel}</ToolTipTSpanLabel>
-					<tspan  fill={textFill}>{value}</tspan>
+					<tspan  fill={textFill}>{interactiveMode ? value : ""}</tspan>
 				</ToolTipText>
 			</g>
 		);
@@ -66,6 +66,7 @@ RSITooltip.propTypes = {
 	displayValuesFor: PropTypes.func,
 	textFill: PropTypes.string,
 	labelFill: PropTypes.string,
+	interactiveMode: PropTypes.bool,
 };
 
 RSITooltip.defaultProps = {
@@ -73,6 +74,7 @@ RSITooltip.defaultProps = {
 	displayValuesFor: displayValuesFor,
 	origin: [0, 0],
 	className: "react-stockcharts-tooltip",
+	interactiveMode: false,
 };
 
 export default RSITooltip;

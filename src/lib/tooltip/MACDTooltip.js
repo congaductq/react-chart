@@ -17,7 +17,7 @@ class MACDTooltip extends Component {
 		this.renderSVG = this.renderSVG.bind(this);
 	}
 	renderSVG(moreProps) {
-		const { onClick, fontFamily, fontSize, displayFormat, className } = this.props;
+		const { onClick, fontFamily, fontSize, displayFormat, className, interactiveMode } = this.props;
 		const { yAccessor, options, appearance, labelFill } = this.props;
 		const { displayValuesFor } = this.props;
 
@@ -42,14 +42,18 @@ class MACDTooltip extends Component {
 					<tspan fill={appearance.stroke.macd}>{options.slow}</tspan>
 					<ToolTipTSpanLabel fill={labelFill}>, </ToolTipTSpanLabel>
 					<tspan fill={appearance.stroke.macd}>{options.fast}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-					<tspan fill={appearance.stroke.macd}>{macd}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}> Signal (</ToolTipTSpanLabel>
-					<tspan fill={appearance.stroke.signal}>{options.signal}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-					<tspan fill={appearance.stroke.signal}>{signal}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}> Divergence: </ToolTipTSpanLabel>
-					<tspan fill={appearance.fill.divergence}>{divergence}</tspan>
+					<ToolTipTSpanLabel fill={labelFill}>){interactiveMode ? ": " : ""}</ToolTipTSpanLabel>
+          { interactiveMode ? (
+            <tspan>
+              <tspan fill={appearance.stroke.macd}>{macd}</tspan>
+              <ToolTipTSpanLabel fill={labelFill}> Signal (</ToolTipTSpanLabel>
+              <tspan fill={appearance.stroke.signal}>{options.signal}</tspan>
+              <ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
+              <tspan fill={appearance.stroke.signal}>{signal}</tspan>
+              <ToolTipTSpanLabel fill={labelFill}> Divergence: </ToolTipTSpanLabel>
+              <tspan fill={appearance.fill.divergence}>{divergence}</tspan>
+            </tspan>
+          ) : null}
 				</ToolTipText>
 			</g>
 		);
@@ -91,6 +95,7 @@ MACDTooltip.propTypes = {
 	displayFormat: PropTypes.func.isRequired,
 	displayValuesFor: PropTypes.func,
 	onClick: PropTypes.func,
+	interactiveMode: PropTypes.bool,
 };
 
 MACDTooltip.defaultProps = {
@@ -98,6 +103,7 @@ MACDTooltip.defaultProps = {
 	displayFormat: format(".2f"),
 	displayValuesFor: displayValuesFor,
 	className: "react-stockcharts-tooltip",
+	interactiveMode: false,
 };
 
 export default MACDTooltip;

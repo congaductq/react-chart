@@ -16,7 +16,7 @@ class BollingerBandTooltip extends Component {
 		this.renderSVG = this.renderSVG.bind(this);
 	}
 	renderSVG(moreProps) {
-		const { onClick, displayFormat, yAccessor, options, textFill, labelFill } = this.props;
+		const { onClick, displayFormat, yAccessor, options, textFill, labelFill, interactiveMode } = this.props;
 		const { displayValuesFor } = this.props;
 
 		const { chartConfig: { width, height } } = moreProps;
@@ -39,8 +39,8 @@ class BollingerBandTooltip extends Component {
 		const [x, y] = origin(width, height);
 
 		const { sourcePath, windowSize, multiplier, movingAverageType } = options;
-		const tooltipLabel = `BB(${sourcePath}, ${windowSize}, ${multiplier}, ${movingAverageType}): `;
-		const tooltipValue = `${top}, ${middle}, ${bottom}`;
+		const tooltipLabel = `BB(${sourcePath}, ${windowSize}, ${multiplier}, ${movingAverageType})${interactiveMode ? ": " : ""}`;
+		const tooltipValue = interactiveMode ? `${top}, ${middle}, ${bottom}` : "";
 		return (
 			<g transform={`translate(${ x }, ${ y })`}
 				className={this.props.className} onClick={onClick}>
@@ -78,6 +78,7 @@ BollingerBandTooltip.propTypes = {
 	labelFill: PropTypes.string,
 	fontFamily: PropTypes.string,
 	fontSize: PropTypes.number,
+	interactiveMode: PropTypes.bool,
 };
 
 BollingerBandTooltip.defaultProps = {
@@ -85,6 +86,7 @@ BollingerBandTooltip.defaultProps = {
 	displayFormat: format(".2f"),
 	displayValuesFor: displayValuesFor,
 	origin: [0, 10],
+	interactiveMode: false,
 };
 
 export default BollingerBandTooltip;

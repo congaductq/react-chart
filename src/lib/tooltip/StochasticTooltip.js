@@ -17,7 +17,7 @@ class StochasticTooltip extends Component {
 		this.renderSVG = this.renderSVG.bind(this);
 	}
 	renderSVG(moreProps) {
-		const { onClick, fontFamily, fontSize, yAccessor, displayFormat, label } = this.props;
+		const { onClick, fontFamily, fontSize, yAccessor, displayFormat, label, interactiveMode } = this.props;
 		const { className, options, appearance, labelFill } = this.props;
 		const { displayValuesFor } = this.props;
 		const { chartConfig: { width, height } } = moreProps;
@@ -36,14 +36,18 @@ class StochasticTooltip extends Component {
 		return (
 			<g className={className} transform={`translate(${ x }, ${ y })`} onClick={onClick}>
 				<ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize}>
-					<ToolTipTSpanLabel fill={labelFill}>{`${ label } %K(`}</ToolTipTSpanLabel>
-					<tspan fill={stroke.kLine}>{`${options.windowSize}, ${options.kWindowSize}`}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-					<tspan fill={stroke.kLine}>{K}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}> %D (</ToolTipTSpanLabel>
-					<tspan fill={stroke.dLine}>{options.dWindowSize}</tspan>
-					<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-					<tspan fill={stroke.dLine}>{D}</tspan>
+					<ToolTipTSpanLabel fill={labelFill}>{`${ label }${interactiveMode ? " %K(" : ""}`}</ToolTipTSpanLabel>
+          { interactiveMode ? (
+            <tspan>
+              <tspan fill={stroke.kLine}>{`${options.windowSize}, ${options.kWindowSize}`}</tspan>
+              <ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
+              <tspan fill={stroke.kLine}>{K}</tspan>
+              <ToolTipTSpanLabel fill={labelFill}> %D (</ToolTipTSpanLabel>
+              <tspan fill={stroke.dLine}>{options.dWindowSize}</tspan>
+              <ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
+              <tspan fill={stroke.dLine}>{D}</tspan>
+            </tspan>
+          ) : null}
 				</ToolTipText>
 			</g>
 		);
@@ -83,6 +87,7 @@ StochasticTooltip.propTypes = {
 	displayFormat: PropTypes.func.isRequired,
 	displayValuesFor: PropTypes.func,
 	label: PropTypes.string.isRequired,
+	interactiveMode: PropTypes.bool,
 };
 
 StochasticTooltip.defaultProps = {
@@ -91,6 +96,7 @@ StochasticTooltip.defaultProps = {
 	origin: [0, 0],
 	className: "react-stockcharts-tooltip",
 	label: "STO",
+	interactiveMode: false,
 };
 
 export default StochasticTooltip;

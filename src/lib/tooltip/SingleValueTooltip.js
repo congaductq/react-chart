@@ -17,7 +17,7 @@ class SingleValueTooltip extends Component {
 	}
 	renderSVG(moreProps) {
 
-		const { onClick, fontFamily, fontSize, labelFill, valueFill, className } = this.props;
+		const { onClick, fontFamily, fontSize, labelFill, valueFill, className, interactiveMode } = this.props;
 		const { xDisplayFormat, yDisplayFormat, xLabel, yLabel, xAccessor, yAccessor } = this.props;
 		const { displayValuesFor } = this.props;
 
@@ -35,10 +35,10 @@ class SingleValueTooltip extends Component {
 			<g className={className} transform={`translate(${ x }, ${ y })`} onClick={onClick}>
 				<ToolTipText x={0} y={0}
 					fontFamily={fontFamily} fontSize={fontSize}>
-					{ xLabel ? <ToolTipTSpanLabel x={0} dy="5" fill={labelFill}>{`${xLabel}: `}</ToolTipTSpanLabel> : null}
-					{ xLabel ? <tspan fill={valueFill}>{`${xDisplayValue} `}</tspan> : null}
-					<ToolTipTSpanLabel fill={labelFill}>{`${yLabel}: `}</ToolTipTSpanLabel>
-					<tspan fill={valueFill} >{yDisplayValue}</tspan>
+					{ xLabel ? <ToolTipTSpanLabel x={0} dy="5" fill={labelFill}>{`${xLabel}${interactiveMode ? ": " : ""}`}</ToolTipTSpanLabel> : null}
+					{ xLabel ? <tspan fill={valueFill}>{`${interactiveMode ? xDisplayValue : ""} `}</tspan> : null}
+					<ToolTipTSpanLabel fill={labelFill}>{`${yLabel}${interactiveMode ? ": " : ""}`}</ToolTipTSpanLabel>
+					<tspan fill={valueFill} >{interactiveMode ? yDisplayValue : ""}</tspan>
 				</ToolTipText>
 			</g>
 		);
@@ -73,6 +73,7 @@ SingleValueTooltip.propTypes = {
 	displayValuesFor: PropTypes.func,
 	xAccessor: PropTypes.func,
 	yAccessor: PropTypes.func,
+	interactiveMode: PropTypes.bool,
 };
 
 SingleValueTooltip.defaultProps = {
@@ -84,6 +85,7 @@ SingleValueTooltip.defaultProps = {
 	xAccessor: noop,
 	yAccessor: identity,
 	className: "react-stockcharts-tooltip",
+	interactiveMode: false,
 };
 
 export default SingleValueTooltip;
