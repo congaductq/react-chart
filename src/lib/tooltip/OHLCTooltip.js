@@ -24,7 +24,8 @@ class OHLCTooltip extends Component {
 			volumeFormat,
 			ohlcFormat,
 			percentFormat,
-			displayTexts
+			displayTexts,
+			tooltipDefault
 		} = this.props;
 
 		const { chartConfig: { width, height } } = moreProps;
@@ -46,6 +47,14 @@ class OHLCTooltip extends Component {
 			low = ohlcFormat(item.low);
 			close = ohlcFormat(item.close);
 			percent = percentFormat((item.close - item.open) / item.open);
+		} else if (tooltipDefault) {
+			volume = isDefined(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume) : displayTexts.na;
+			max_cap = isDefined(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap) : displayTexts.na;
+			displayDate = xDisplayFormat(displayXAccessor(tooltipDefault));
+			open = ohlcFormat(tooltipDefault.open);
+			high = ohlcFormat(tooltipDefault.high);
+			low = ohlcFormat(tooltipDefault.low);
+			close = ohlcFormat(tooltipDefault.close);
 		}
 
 		const { origin: originProp } = this.props;
@@ -93,6 +102,7 @@ OHLCTooltip.propTypes = {
 	textFill: PropTypes.string,
 	labelFill: PropTypes.string,
 	displayTexts: PropTypes.object,
+	tooltipDefault: PropTypes.object,
 };
 
 const displayTextsDefault = {

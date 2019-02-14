@@ -212,7 +212,17 @@ class CandlestickChart extends React.Component {
 					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
 						yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
-					<OHLCTooltip origin={[-40, 0]}/>
+					<OHLCTooltip origin={[-40, 0]}
+						tooltipDefault={{
+							date: data[data.length - 1].date,
+							open: data[data.length - 1].open,
+							close: data[data.length - 1].close,
+							high: data[data.length - 1].high,
+							low: data[data.length - 1].low,
+							volume: data[data.length - 1].volume,
+							max_cap: data[data.length - 1].max_cap,
+						}}
+					/>
 
 					<MovingAverageTooltip
 						onClick={e => console.log(e)}
