@@ -60,10 +60,10 @@ var OHLCTooltip = function (_Component) {
 			    max_cap = void 0;
 			displayDate = open = high = low = close = volume = percent = max_cap = null;
 
-			if (isDefined(currentItem) && isDefined(accessor(currentItem))) {
+			if (isDefined(currentItem) && isDefined(accessor(currentItem)) && moreProps.show) {
 				var item = accessor(currentItem);
-				volume = isDefined(item.volume) ? volumeFormat(item.volume) : null;
-				max_cap = isDefined(item.max_cap) ? volumeFormat(item.max_cap) : null;
+				volume = isDefined(item.volume) ? volumeFormat(item.volume).replace("G", "B") : null;
+				max_cap = isDefined(item.max_cap) ? volumeFormat(item.max_cap).replace("G", "B") : null;
 
 				displayDate = xDisplayFormat(displayXAccessor(item));
 				open = ohlcFormat(item.open);
@@ -72,8 +72,8 @@ var OHLCTooltip = function (_Component) {
 				close = ohlcFormat(item.close);
 				percent = percentFormat((item.close - item.open) / item.open);
 			} else if (tooltipDefault) {
-				volume = isDefined(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume) : null;
-				max_cap = isDefined(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap) : null;
+				volume = isDefined(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume).replace("G", "B") : null;
+				max_cap = isDefined(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap).replace("G", "B") : null;
 				displayDate = xDisplayFormat(displayXAccessor(tooltipDefault));
 				open = ohlcFormat(tooltipDefault.open);
 				high = ohlcFormat(tooltipDefault.high);
@@ -132,7 +132,7 @@ OHLCTooltip.propTypes = {
 	onClick: PropTypes.func,
 	displayValuesFor: PropTypes.func,
 	textFill: PropTypes.string,
-	labelFill: PropTypes.string,
+	labelFill: PropTypes.object,
 	displayTexts: PropTypes.object,
 	tooltipDefault: PropTypes.object
 };
@@ -207,21 +207,25 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 				fontFamily: fontFamily,
 				fontSize: fontSize
 			},
-			React.createElement(
-				ToolTipTSpanLabel,
-				{
-					fill: labelFill,
-					key: "label",
-					x: 0,
-					dy: "5" },
-				displayTexts.d
+			isDefined(displayDate) && React.createElement(
+				React.Fragment,
+				null,
+				React.createElement(
+					ToolTipTSpanLabel,
+					{
+						fill: labelFill,
+						key: "label",
+						x: 0,
+						dy: "5" },
+					displayTexts.d
+				),
+				React.createElement(
+					"tspan",
+					{ key: "value", fill: textFill },
+					displayDate
+				)
 			),
-			React.createElement(
-				"tspan",
-				{ key: "value", fill: textFill },
-				displayDate
-			),
-			isDefined(open) ? React.createElement(
+			isDefined(open) && displayTexts.o ? React.createElement(
 				React.Fragment,
 				null,
 				React.createElement(
@@ -235,7 +239,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					open
 				)
 			) : "",
-			isDefined(high) ? React.createElement(
+			isDefined(high) && displayTexts.h ? React.createElement(
 				React.Fragment,
 				null,
 				React.createElement(
@@ -249,7 +253,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					high
 				)
 			) : "",
-			isDefined(low) ? React.createElement(
+			isDefined(low) && displayTexts.l ? React.createElement(
 				React.Fragment,
 				null,
 				React.createElement(
@@ -263,7 +267,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					low
 				)
 			) : "",
-			isDefined(close) ? React.createElement(
+			isDefined(close) && displayTexts.c ? React.createElement(
 				React.Fragment,
 				null,
 				React.createElement(
@@ -277,7 +281,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					close
 				)
 			) : "",
-			isDefined(volume) ? React.createElement(
+			isDefined(volume) && displayTexts.v ? React.createElement(
 				React.Fragment,
 				null,
 				React.createElement(
@@ -291,7 +295,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					volume
 				)
 			) : "",
-			isDefined(max_cap) ? React.createElement(
+			isDefined(max_cap) && displayTexts.m ? React.createElement(
 				React.Fragment,
 				null,
 				React.createElement(

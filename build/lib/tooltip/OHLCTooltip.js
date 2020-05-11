@@ -87,10 +87,10 @@ var OHLCTooltip = function (_Component) {
 			    max_cap = void 0;
 			displayDate = open = high = low = close = volume = percent = max_cap = null;
 
-			if ((0, _utils.isDefined)(currentItem) && (0, _utils.isDefined)(accessor(currentItem))) {
+			if ((0, _utils.isDefined)(currentItem) && (0, _utils.isDefined)(accessor(currentItem)) && moreProps.show) {
 				var item = accessor(currentItem);
-				volume = (0, _utils.isDefined)(item.volume) ? volumeFormat(item.volume) : null;
-				max_cap = (0, _utils.isDefined)(item.max_cap) ? volumeFormat(item.max_cap) : null;
+				volume = (0, _utils.isDefined)(item.volume) ? volumeFormat(item.volume).replace("G", "B") : null;
+				max_cap = (0, _utils.isDefined)(item.max_cap) ? volumeFormat(item.max_cap).replace("G", "B") : null;
 
 				displayDate = xDisplayFormat(displayXAccessor(item));
 				open = ohlcFormat(item.open);
@@ -99,8 +99,8 @@ var OHLCTooltip = function (_Component) {
 				close = ohlcFormat(item.close);
 				percent = percentFormat((item.close - item.open) / item.open);
 			} else if (tooltipDefault) {
-				volume = (0, _utils.isDefined)(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume) : null;
-				max_cap = (0, _utils.isDefined)(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap) : null;
+				volume = (0, _utils.isDefined)(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume).replace("G", "B") : null;
+				max_cap = (0, _utils.isDefined)(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap).replace("G", "B") : null;
 				displayDate = xDisplayFormat(displayXAccessor(tooltipDefault));
 				open = ohlcFormat(tooltipDefault.open);
 				high = ohlcFormat(tooltipDefault.high);
@@ -159,7 +159,7 @@ OHLCTooltip.propTypes = {
 	onClick: _propTypes2.default.func,
 	displayValuesFor: _propTypes2.default.func,
 	textFill: _propTypes2.default.string,
-	labelFill: _propTypes2.default.string,
+	labelFill: _propTypes2.default.object,
 	displayTexts: _propTypes2.default.object,
 	tooltipDefault: _propTypes2.default.object
 };
@@ -234,21 +234,25 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 				fontFamily: fontFamily,
 				fontSize: fontSize
 			},
-			_react2.default.createElement(
-				_ToolTipTSpanLabel2.default,
-				{
-					fill: labelFill,
-					key: "label",
-					x: 0,
-					dy: "5" },
-				displayTexts.d
+			(0, _utils.isDefined)(displayDate) && _react2.default.createElement(
+				_react2.default.Fragment,
+				null,
+				_react2.default.createElement(
+					_ToolTipTSpanLabel2.default,
+					{
+						fill: labelFill,
+						key: "label",
+						x: 0,
+						dy: "5" },
+					displayTexts.d
+				),
+				_react2.default.createElement(
+					"tspan",
+					{ key: "value", fill: textFill },
+					displayDate
+				)
 			),
-			_react2.default.createElement(
-				"tspan",
-				{ key: "value", fill: textFill },
-				displayDate
-			),
-			(0, _utils.isDefined)(open) ? _react2.default.createElement(
+			(0, _utils.isDefined)(open) && displayTexts.o ? _react2.default.createElement(
 				_react2.default.Fragment,
 				null,
 				_react2.default.createElement(
@@ -262,7 +266,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					open
 				)
 			) : "",
-			(0, _utils.isDefined)(high) ? _react2.default.createElement(
+			(0, _utils.isDefined)(high) && displayTexts.h ? _react2.default.createElement(
 				_react2.default.Fragment,
 				null,
 				_react2.default.createElement(
@@ -276,7 +280,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					high
 				)
 			) : "",
-			(0, _utils.isDefined)(low) ? _react2.default.createElement(
+			(0, _utils.isDefined)(low) && displayTexts.l ? _react2.default.createElement(
 				_react2.default.Fragment,
 				null,
 				_react2.default.createElement(
@@ -290,7 +294,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					low
 				)
 			) : "",
-			(0, _utils.isDefined)(close) ? _react2.default.createElement(
+			(0, _utils.isDefined)(close) && displayTexts.c ? _react2.default.createElement(
 				_react2.default.Fragment,
 				null,
 				_react2.default.createElement(
@@ -304,7 +308,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					close
 				)
 			) : "",
-			(0, _utils.isDefined)(volume) ? _react2.default.createElement(
+			(0, _utils.isDefined)(volume) && displayTexts.v ? _react2.default.createElement(
 				_react2.default.Fragment,
 				null,
 				_react2.default.createElement(
@@ -318,7 +322,7 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					volume
 				)
 			) : "",
-			(0, _utils.isDefined)(max_cap) ? _react2.default.createElement(
+			(0, _utils.isDefined)(max_cap) && displayTexts.m ? _react2.default.createElement(
 				_react2.default.Fragment,
 				null,
 				_react2.default.createElement(

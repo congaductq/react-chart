@@ -34,12 +34,11 @@ function loadPage() {
 			d.high = +d.high;
 			d.low = +d.low;
 			d.close = +d.close;
-			d.volume = +d.volume;
+			d.volume = +d.volume * 1000;
 
 			return d;
 		}))
 		.then(data => {
-			console.log(data);
 			ReactDOM.render(<Chart data={data} type="hybrid"/>, document.getElementById("chart"));
 		});
 }
