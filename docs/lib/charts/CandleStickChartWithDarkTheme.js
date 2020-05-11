@@ -82,7 +82,7 @@ class CandlestickChart extends React.Component {
 				`trends_${each.chartId}`,
 				each.objects,
 			];
-    });
+		});
 		this.setState(state);
 	}
 	onDrawCompleteChart1(trends_1) {
@@ -106,37 +106,37 @@ class CandlestickChart extends React.Component {
 	onKeyPress(e) {
 		const keyCode = e.which;
 		switch (keyCode) {
-		case 46: { // DEL
+			case 46: { // DEL
 
-			const trends_1 = this.state.trends_1
-				.filter(each => !each.selected);
-			const trends_3 = this.state.trends_3
-				.filter(each => !each.selected);
+				const trends_1 = this.state.trends_1
+					.filter(each => !each.selected);
+				const trends_3 = this.state.trends_3
+					.filter(each => !each.selected);
 
-			this.canvasNode.cancelDrag();
-			this.setState({
-        enableTrendLine: true,
-				trends_1,
-				trends_3,
-			});
-			break;
-		}
-		case 27: { // ESC
-			this.node_1.terminate();
-			this.node_3.terminate();
-			this.canvasNode.cancelDrag();
-			this.setState({
-				enableTrendLine: false
-			});
-			break;
-		}
-		case 68:   // D - Draw trendline
-		case 69: { // E - Enable trendline
-			this.setState({
-				enableTrendLine: true
-			});
-			break;
-		}
+				this.canvasNode.cancelDrag();
+				this.setState({
+					enableTrendLine: true,
+					trends_1,
+					trends_3,
+				});
+				break;
+			}
+			case 27: { // ESC
+				this.node_1.terminate();
+				this.node_3.terminate();
+				this.canvasNode.cancelDrag();
+				this.setState({
+					enableTrendLine: false
+				});
+				break;
+			}
+			case 68:   // D - Draw trendline
+			case 69: { // E - Enable trendline
+				this.setState({
+					enableTrendLine: true
+				});
+				break;
+			}
 		}
 	}
 	render() {

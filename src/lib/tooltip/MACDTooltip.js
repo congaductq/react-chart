@@ -43,17 +43,17 @@ class MACDTooltip extends Component {
 					<ToolTipTSpanLabel fill={labelFill}>, </ToolTipTSpanLabel>
 					<tspan fill={appearance.stroke.macd}>{options.fast}</tspan>
 					<ToolTipTSpanLabel fill={labelFill}>){interactiveMode ? ": " : ""}</ToolTipTSpanLabel>
-          { interactiveMode ? (
-            <tspan>
-              <tspan fill={appearance.stroke.macd}>{macd}</tspan>
-              <ToolTipTSpanLabel fill={labelFill}> Signal (</ToolTipTSpanLabel>
-              <tspan fill={appearance.stroke.signal}>{options.signal}</tspan>
-              <ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-              <tspan fill={appearance.stroke.signal}>{signal}</tspan>
-              <ToolTipTSpanLabel fill={labelFill}> Divergence: </ToolTipTSpanLabel>
-              <tspan fill={appearance.fill.divergence}>{divergence}</tspan>
-            </tspan>
-          ) : null}
+					{ interactiveMode ? (
+						<tspan>
+							<tspan fill={appearance.stroke.macd}>{macd}</tspan>
+							<ToolTipTSpanLabel fill={labelFill}> Signal (</ToolTipTSpanLabel>
+							<tspan fill={appearance.stroke.signal}>{options.signal}</tspan>
+							<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
+							<tspan fill={appearance.stroke.signal}>{signal}</tspan>
+							<ToolTipTSpanLabel fill={labelFill}> Divergence: </ToolTipTSpanLabel>
+							<tspan fill={appearance.fill.divergence}>{divergence}</tspan>
+						</tspan>
+					) : null}
 				</ToolTipText>
 			</g>
 		);

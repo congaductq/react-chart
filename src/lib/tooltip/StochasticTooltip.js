@@ -37,17 +37,17 @@ class StochasticTooltip extends Component {
 			<g className={className} transform={`translate(${ x }, ${ y })`} onClick={onClick}>
 				<ToolTipText x={0} y={0} fontFamily={fontFamily} fontSize={fontSize}>
 					<ToolTipTSpanLabel fill={labelFill}>{`${ label }${interactiveMode ? " %K(" : ""}`}</ToolTipTSpanLabel>
-          { interactiveMode ? (
-            <tspan>
-              <tspan fill={stroke.kLine}>{`${options.windowSize}, ${options.kWindowSize}`}</tspan>
-              <ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-              <tspan fill={stroke.kLine}>{K}</tspan>
-              <ToolTipTSpanLabel fill={labelFill}> %D (</ToolTipTSpanLabel>
-              <tspan fill={stroke.dLine}>{options.dWindowSize}</tspan>
-              <ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
-              <tspan fill={stroke.dLine}>{D}</tspan>
-            </tspan>
-          ) : null}
+					{ interactiveMode ? (
+						<tspan>
+							<tspan fill={stroke.kLine}>{`${options.windowSize}, ${options.kWindowSize}`}</tspan>
+							<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
+							<tspan fill={stroke.kLine}>{K}</tspan>
+							<ToolTipTSpanLabel fill={labelFill}> %D (</ToolTipTSpanLabel>
+							<tspan fill={stroke.dLine}>{options.dWindowSize}</tspan>
+							<ToolTipTSpanLabel fill={labelFill}>): </ToolTipTSpanLabel>
+							<tspan fill={stroke.dLine}>{D}</tspan>
+						</tspan>
+					) : null}
 				</ToolTipText>
 			</g>
 		);

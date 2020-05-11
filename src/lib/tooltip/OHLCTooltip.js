@@ -24,7 +24,6 @@ class OHLCTooltip extends Component {
 			volumeFormat,
 			ohlcFormat,
 			percentFormat,
-			displayTexts,
 			tooltipDefault
 		} = this.props;
 
@@ -34,12 +33,12 @@ class OHLCTooltip extends Component {
 		const currentItem = displayValuesFor(this.props, moreProps);
 
 		let displayDate, open, high, low, close, volume, percent, max_cap;
-		displayDate = open = high = low = close = volume = percent = max_cap = displayTexts.na;
+		displayDate = open = high = low = close = volume = percent = max_cap = null;
 
 		if (isDefined(currentItem) && isDefined(accessor(currentItem))) {
 			const item = accessor(currentItem);
-			volume = isDefined(item.volume) ? volumeFormat(item.volume) : displayTexts.na;
-			max_cap = isDefined(item.max_cap) ? volumeFormat(item.max_cap) : displayTexts.na;
+			volume = isDefined(item.volume) ? volumeFormat(item.volume) : null;
+			max_cap = isDefined(item.max_cap) ? volumeFormat(item.max_cap) : null;
 
 			displayDate = xDisplayFormat(displayXAccessor(item));
 			open = ohlcFormat(item.open);
@@ -48,8 +47,8 @@ class OHLCTooltip extends Component {
 			close = ohlcFormat(item.close);
 			percent = percentFormat((item.close - item.open) / item.open);
 		} else if (tooltipDefault) {
-			volume = isDefined(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume) : displayTexts.na;
-			max_cap = isDefined(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap) : displayTexts.na;
+			volume = isDefined(tooltipDefault.volume) ? volumeFormat(tooltipDefault.volume) : null;
+			max_cap = isDefined(tooltipDefault.max_cap) ? volumeFormat(tooltipDefault.max_cap) : null;
 			displayDate = xDisplayFormat(displayXAccessor(tooltipDefault));
 			open = ohlcFormat(tooltipDefault.open);
 			high = ohlcFormat(tooltipDefault.high);
@@ -181,18 +180,39 @@ function defaultDisplay(props, moreProps, itemsToDisplay) {
 					x={0}
 					dy="5">{displayTexts.d}</ToolTipTSpanLabel>
 				<tspan key="value" fill={textFill}>{displayDate}</tspan>
-				<ToolTipTSpanLabel fill={labelFill} key="label_O">{displayTexts.o}</ToolTipTSpanLabel>
-				<tspan key="value_O" fill={textFill}>{open}</tspan>
-				<ToolTipTSpanLabel fill={labelFill} key="label_H">{displayTexts.h}</ToolTipTSpanLabel>
-				<tspan key="value_H" fill={textFill}>{high}</tspan>
-				<ToolTipTSpanLabel fill={labelFill} key="label_L">{displayTexts.l}</ToolTipTSpanLabel>
-				<tspan key="value_L" fill={textFill}>{low}</tspan>
-				<ToolTipTSpanLabel fill={labelFill} key="label_C">{displayTexts.c}</ToolTipTSpanLabel>
-				<tspan key="value_C" fill={textFill}>{close}</tspan>
-				<ToolTipTSpanLabel fill={labelFill} key="label_Vol">{displayTexts.v}</ToolTipTSpanLabel>
-				<tspan key="value_Vol" fill={textFill}>{volume}</tspan>
-				<ToolTipTSpanLabel fill={labelFill} key="label_Cap">{displayTexts.m}</ToolTipTSpanLabel>
-				<tspan key="value_Cap" fill={textFill}>{max_cap}</tspan>
+				{
+					isDefined(open) ? (
+						<React.Fragment>
+							<ToolTipTSpanLabel fill={labelFill} key="label_C">{displayTexts.o}</ToolTipTSpanLabel>
+							<tspan key="value_C" fill={textFill}>{open}</tspan>
+						</React.Fragment>
+					) : ""
+				}
+				{
+					isDefined(high) ? (
+						<React.Fragment><ToolTipTSpanLabel fill={labelFill} key="label_C">{displayTexts.h}</ToolTipTSpanLabel><tspan key="value_C" fill={textFill}>{high}</tspan></React.Fragment>
+					) : ""
+				}
+				{
+					isDefined(low) ? (
+						<React.Fragment><ToolTipTSpanLabel fill={labelFill} key="label_C">{displayTexts.l}</ToolTipTSpanLabel><tspan key="value_C" fill={textFill}>{low}</tspan></React.Fragment>
+					) : ""
+				}
+				{
+					isDefined(close) ? (
+						<React.Fragment><ToolTipTSpanLabel fill={labelFill} key="label_C">{displayTexts.c}</ToolTipTSpanLabel><tspan key="value_C" fill={textFill}>{close}</tspan></React.Fragment>
+					) : ""
+				}
+				{
+					isDefined(volume) ? (
+						<React.Fragment><ToolTipTSpanLabel fill={labelFill} key="label_Vol">{displayTexts.v}</ToolTipTSpanLabel><tspan key="value_Vol" fill={textFill}>{volume}</tspan></React.Fragment>
+					) : ""
+				}
+				{
+					isDefined(max_cap) ? (
+						<React.Fragment><ToolTipTSpanLabel fill={labelFill} key="label_Cap">{displayTexts.m}</ToolTipTSpanLabel><tspan key="value_Cap" fill={textFill}>{max_cap}</tspan></React.Fragment>
+					) : ""
+				}
 			</ToolTipText>
 		</g>
 	);

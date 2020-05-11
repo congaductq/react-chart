@@ -39,6 +39,7 @@ function loadPage() {
 			return d;
 		}))
 		.then(data => {
+			console.log(data);
 			ReactDOM.render(<Chart data={data} type="hybrid"/>, document.getElementById("chart"));
 		});
 }

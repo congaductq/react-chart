@@ -93,8 +93,8 @@ class MovingAverageTooltip extends Component {
 							fontFamily={fontFamily}
 							fontSize={fontSize}
 							textFill={textFill}
-              labelFill={labelFill}
-              interactiveMode={interactiveMode}
+							labelFill={labelFill}
+							interactiveMode={interactiveMode}
 						/>;
 					})}
 			</g>

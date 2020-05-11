@@ -222,8 +222,8 @@ export function drawOnCanvas(ctx, props) {
 		const {
 			rectWidth,
 			rectHeight,
-			rectRadius,
-			arrowWidth
+			// rectRadius,
+			// arrowWidth
 		} = edge.coordinateBase;
 
 		ctx.fillStyle = hexToRGBA(
@@ -238,9 +238,9 @@ export function drawOnCanvas(ctx, props) {
 			ctx.lineWidth = edge.coordinateBase.strokeWidth;
 		}
 
-		let x = edge.coordinateBase.edgeXRect;
+		const x = edge.coordinateBase.edgeXRect;
 		const y = edge.coordinateBase.edgeYRect;
-		const halfHeight = rectHeight / 2;
+		// const halfHeight = rectHeight / 2;
 
 		ctx.beginPath();
 		// if (edge.orient === "right") {
@@ -267,7 +267,7 @@ export function drawOnCanvas(ctx, props) {
 		// 		ctx.rect(x, y, rectWidth, rectHeight);
 		// 	}
 		// }
-    roundRect(ctx, x, y, rectWidth, rectHeight, 3);
+		roundRect(ctx, x, y, rectWidth, rectHeight, 3);
 		ctx.fill();
 
 		if (isDefined(edge.coordinateBase.stroke)) {
